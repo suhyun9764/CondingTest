@@ -2,8 +2,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 public class Main {
@@ -20,24 +18,37 @@ public class Main {
             arr[i] = Integer.parseInt(st.nextToken());
         }
         Arrays.sort(arr);
-        Set<Integer> sumSet = new HashSet<>();
+
+        int[] sum = new int[n*(n+1)/2];
+        int index =0;
         for(int i=0;i<n;i++){
             for(int j=i;j<n;j++){
-                sumSet.add(arr[i]+arr[j]);
+                sum[index++] = arr[i]+arr[j];
             }
         }
-
-        int ans = 0;
-        for(int i=arr.length-1;i>=0;i--){
+        Arrays.sort(sum);
+        int ans=0;
+        for(int i=0;i<n;i++){
             for(int j=0;j<n;j++){
                 int target = arr[i]-arr[j];
-                if(sumSet.contains(target))
-                    ans = Math.max(ans,arr[i]);
+                if(haveValue(sum,target))
+                ans = Math.max(ans,arr[i]);
             }
         }
         
-
         System.out.println(ans);
+    }
+
+    private static boolean haveValue(int[] sum, int target) {
+        int start =0;
+        int end = sum.length-1;
+        while(start<=end){
+            int m = (start+end)/2;
+            if(sum[m]<target) start = m+1;
+            else if(sum[m]>target) end = m-1;
+            else return true;
+        }
+        return false;
     }
 
 }
