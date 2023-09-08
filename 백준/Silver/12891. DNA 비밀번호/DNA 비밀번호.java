@@ -5,100 +5,104 @@ import java.util.StringTokenizer;
 
 public class Main {
 
-	static int cArr[];
-	static int nowArr[];
-	static int checkSecret;
-	
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		
-		int S = Integer.parseInt(st.nextToken());
-		int P = Integer.parseInt(st.nextToken());
-		
-		int cnt=0;
-		char[] dArr = new char[S];
-		dArr = br.readLine().toCharArray();
-		
-		cArr = new int[4];
-		nowArr= new int[4];
-		checkSecret =0;
-		st = new StringTokenizer(br.readLine());
-		for(int i=0;i<4;i++) {
-			cArr[i] = Integer.parseInt(st.nextToken());
-			if(cArr[i]==0)
-				checkSecret++;
-		}
-		
-		for(int i=0;i<P;i++) {
-			ADD(dArr[i]);
-		}
-		if(checkSecret==4)
-			cnt++;
-		
-		for(int i=P;i<S;i++) {
-			int j = i-P;
-			ADD(dArr[i]);
-			REMOVE(dArr[j]);
-			if(checkSecret == 4)
-				cnt++;
-		}
-		System.out.println(cnt);
-		br.close();
-	}
-	
-	private static void ADD(char c) {
-		switch(c) {
-		case 'A':
-			nowArr[0]++;
-			if(nowArr[0]==cArr[0])
-				checkSecret++;
-			break;
-		
-		case 'C':
-			nowArr[1]++;
-			if(nowArr[1]==cArr[1])
-				checkSecret++;
-			break;
-		case 'G':
-			nowArr[2]++;
-			if(nowArr[2]==cArr[2])
-				checkSecret++;
-			break;
-		case 'T':
-			nowArr[3]++;
-			if(nowArr[3]==cArr[3])
-				checkSecret++;
-			break;
-		}
-	}
-	
-	private static void REMOVE(char c) {
-		switch(c) {
-		case 'A':
-			if(nowArr[0]==cArr[0])
-				checkSecret--;
-			nowArr[0]--;
-			break;
-		
-		case 'C':
-			
-			if(nowArr[1]==cArr[1])
-				checkSecret--;
-			nowArr[1]--;
-			break;
-		case 'G':
-			
-			if(nowArr[2]==cArr[2])
-				checkSecret--;
-			nowArr[2]--;
-			break;
-		case 'T':
-			if(nowArr[3]==cArr[3])
-				checkSecret--;
-			nowArr[3]--;
-			break;
-		}
-	}
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
+        int s = Integer.parseInt(st.nextToken());
+        int p = Integer.parseInt(st.nextToken());
+
+        char[] arr = new char[s];
+        st = new StringTokenizer(br.readLine());
+        arr = st.nextToken().toCharArray();
+
+        int[] checkArr = new int[4];
+        st = new StringTokenizer(br.readLine());
+        for(int i=0;i<4;i++){
+            checkArr[i] = Integer.parseInt(st.nextToken());
+        }
+
+        int[] currentArr = new int[4];
+        for(int i=0;i<p;i++){
+            switch (arr[i]){
+                case 'A':
+                    currentArr[0]++;
+                    break;
+                case 'C':
+                    currentArr[1]++;
+                    break;
+                case 'G':
+                    currentArr[2]++;
+                    break;
+                case 'T':
+                    currentArr[3]++;
+                    break;
+            }
+        }
+        int cnt=0;
+        if(comparePwd(currentArr,checkArr)){
+            cnt++;
+        }
+        int start = 1;
+        int end = p;
+
+        while (end<arr.length){
+            updateCurrentArr(currentArr,arr,start,end);
+            if(comparePwd(currentArr,checkArr)){
+                cnt++;
+            }
+            start++;
+            end++;
+
+        }
+
+        System.out.println(cnt);
+
+
+    }
+
+    private static void updateCurrentArr(int[] currentArr, char[] arr, int start, int end) {
+        switch (arr[start-1]){
+            case 'A':
+                currentArr[0]--;
+                break;
+            case 'C':
+                currentArr[1]--;
+                break;
+            case 'G':
+                currentArr[2]--;
+                break;
+            case 'T':
+                currentArr[3]--;
+                break;
+        }
+
+        switch (arr[end]){
+            case 'A':
+                currentArr[0]++;
+                break;
+            case 'C':
+                currentArr[1]++;
+                break;
+            case 'G':
+                currentArr[2]++;
+                break;
+            case 'T':
+                currentArr[3]++;
+                break;
+        }
+
+    }
+
+    private static boolean comparePwd(int[] currentArr, int[] checkArr) {
+        int checkCnt =0;
+        for(int i=0;i<currentArr.length;i++){
+            if (currentArr[i]>=checkArr[i])
+                checkCnt++;
+        }
+        if(checkCnt==4)
+            return true;
+        else
+            return false;
+    }
 }
