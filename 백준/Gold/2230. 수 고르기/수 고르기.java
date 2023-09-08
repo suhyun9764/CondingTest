@@ -21,16 +21,17 @@ public class Main {
 
         Arrays.sort(arr);
         int end = 0;
-        int value = arr[end]-arr[0];
+  
         int min = arr[arr.length-1]-arr[0];
         for(int i=0;i<n;i++){
             while (arr[end]-arr[i]<m&&end<n-1){
                 end++;
             }
-            int diff = arr[end]-arr[i];
-            if(diff>=m){
-                if(diff<min)
-                    min = diff;
+            
+            int value = arr[end]-arr[i];
+            if(value>=m){
+                if(value<min)
+                    min = value;
             }
         }
 
