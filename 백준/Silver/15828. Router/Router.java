@@ -21,7 +21,7 @@ public class Main {
                 break;
             // 나머지 수 들어왔을 때
             else
-                if(queue.size()<=n) // 버퍼 크기만큼만 입력 받기
+                if(queue.size()<n) // 버퍼 크기만큼만 입력 받기
                     queue.offer(input);
         }
         
