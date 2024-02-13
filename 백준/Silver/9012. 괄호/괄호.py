@@ -1,23 +1,30 @@
-class solution:
-    def isValid(self, s: str) -> str:
-        stack = []
+import sys
+
+
+class Solution:
+    def getValid(self, s: str):
+        open_stack = []
         for char in s:
-            if char == ('('):
-                stack.append(char)
-            elif char == (')'):
-                if not stack:
-                    return "NO"
-                stack.pop()
+            if char == '(':
+                open_stack.append(char)
+            else :
+                if open_stack:
+                    open_stack.pop()
+                else:
+                    return False
 
-        if not stack:
-            return "YES"
-        else :
-            return "NO"
+        if open_stack:
+            return False
+        else:
+            return True
 
 
-t = int(input())
-
-for _ in range(t):
-    s = input()
-    sol = solution()
-    print(sol.isValid(s))
+sol = Solution()
+n = int(input())
+for _ in range(n):
+    s = sys.stdin.readline().strip()
+    is_valid = sol.getValid(s)
+    if (is_valid):
+        print("YES")
+    else:
+        print("NO")
