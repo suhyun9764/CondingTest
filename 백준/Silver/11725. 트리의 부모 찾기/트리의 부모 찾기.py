@@ -1,4 +1,6 @@
-from collections import deque
+import sys
+from collections import defaultdict, deque
+
 
 class Solution:
     def get_data(self, num):
@@ -13,25 +15,48 @@ class Solution:
             data_dict[b].append(a)
         return data_dict
 
+    # def get_parent(self, data):
+    #     visited = set()
+    #
+    #     def check_parent(parent, answer):
+    #         visited.add(parent)
+    #         for child in data[parent]:
+    #             if child in visited:
+    #                 continue
+    #             answer[child] = parent
+    #             check_parent(child, answer)
+    #
+    #         return answer
+    #
+    #     answer = check_parent(1, {1: 0})
+    #     sorted_keys = sorted(answer.keys())
+    #     sorted_answer = {key: answer[key] for key in sorted_keys}
+    #     return sorted_answer
+
     def get_parent(self, data):
-        parent = [0] * (len(data) + 1)  # 각 노드의 부모를 저장할 배열 초기화
-        visited = [False] * (len(data) + 1)  # 방문한 노드를 체크할 배열 초기화
-        queue = deque([1])  # 루트 노드부터 시작하여 BFS 탐색을 위한 큐 초기화
+        parent = [0]*(len(data)+1)
+        visited = [False]*(len(data)+1)
+        queue = deque([1])
         visited[1] = True
 
         while queue:
             node = queue.popleft()
-            for child in data.get(node, []):
+            for child in data[node]:
                 if not visited[child]:
                     visited[child] = True
-                    parent[child] = node  # 노드의 부모를 저장
+                    parent[child] = node
                     queue.append(child)
 
         return parent
 
+# sys.setrecursionlimit(10 ** 9)
 sol = Solution()
 num = int(input())
 data = sol.get_data(num)
-parent = sol.get_parent(data)
-for i in range(2, num + 1):
-    print(parent[i])
+answer = sol.get_parent(data)
+# for key in answer:
+#     if key == 1:
+#         continue
+#     print(answer[key])
+for i in range(2, len(answer)):
+    print(answer[i])
