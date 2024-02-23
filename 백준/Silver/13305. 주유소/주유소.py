@@ -27,15 +27,20 @@ class Solution:
         navigation = self.get_near_cheap_gas_station()
         remain_distance = sum(self.load_lengths)
         total_price = 0
-        for i in range(len(self.oil_prices) - 2):
-            if navigation[i] == 0:
-                total_price += remain_distance * self.oil_prices[i]
+        current_gas_station = 0
+        while 1:
+            if current_gas_station >= len(navigation) or navigation[current_gas_station] == 0 :
+                total_price += remain_distance * self.oil_prices[current_gas_station]
                 remain_distance = 0
                 break
 
-            near_distance = self.each_city_length[i + navigation[i]] - self.each_city_length[i]
-            total_price += near_distance * self.oil_prices[i]
+            near_distance = self.each_city_length[current_gas_station + navigation[current_gas_station]] - \
+                            self.each_city_length[current_gas_station]
+            total_price += near_distance * self.oil_prices[current_gas_station]
             remain_distance -= near_distance
+            current_gas_station = current_gas_station + navigation[current_gas_station]
+            if remain_distance == 0:
+                break
 
         total_price += self.oil_prices[-2] * remain_distance
 
