@@ -1,47 +1,29 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.PrimitiveIterator;
-import java.util.StringTokenizer;
-
-import javax.swing.*;
 
 public class Main {
-	private final static int BIG = 5;
-	private final static int SMALL = 3;
+    static int MIN_BAG = 3;
+    static int MAX_BAG = 5;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int N = Integer.parseInt(br.readLine());
 
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		int sugar = Integer.parseInt(st.nextToken());
-		int bigNum = sugar / BIG;
+        int answer = getAnswer(N);
+        System.out.println(answer);
+    }
 
-		if (bigNum == 0) {
-			if (sugar % SMALL != 0) {
-				System.out.println(-1);
-			} else {
-				System.out.println(sugar / SMALL);
-			}
-		} else {
-			List<Integer> ls = new ArrayList<>();
-			while (bigNum >= 0) {
-				int remain = sugar - (BIG * bigNum);
-				if (remain % SMALL == 0) {
-					int smallNum = remain / SMALL;
-					ls.add(smallNum + bigNum);
-				}
-				bigNum--;
-			}
-			if (ls.isEmpty()) {
-				System.out.println(-1);
-			} else {
-				Collections.sort(ls);
-				System.out.println(ls.get(0));
-			}
-		}
-
-	}
+    private static int getAnswer(int n) {
+        int maxBagNum = n/MAX_BAG;
+        int answer = -1;
+        while (maxBagNum>=0){
+            int remain = n - maxBagNum*MAX_BAG;
+            if(remain%MIN_BAG==0){
+                answer = maxBagNum+(remain/MIN_BAG);
+                break;
+            }
+            maxBagNum--;
+        }
+        return answer;
+    }
 }
