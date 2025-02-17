@@ -1,69 +1,100 @@
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
 
+// dfs + 백트래킹
+// 0인 모든 좌표를 zero라는 ArrayList에 담는다. <= 2차원배열 순회하면서 0처리 x
+// Zero의 0 번째 좌표부터 시작
 public class Main {
-    static int[][] board = new int[9][9];
+    static int board[][] = new int[9][9];
+    public static void main(String[] args) throws IOException {
+        setting();
+//        for(int i=0;i<9;i++){
+//            for(int j=0;j<9;j++){
+//                // 이미 채워져있으면 pass
+//                if(board[i][j]!=0) continue;
+//                // 1~9까지 탐색
+//                for(int k=1;k<10;k++){
+//                    if(checkI(i,k)&&checkJ(j,k)&&checkSmallBox(i,j,k)) {
+//                        board[i][j] = k;
+//                    }
+//                }
+//            }
+//
+//        }
+        dfs(0,0);
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        
-        // 스도쿠 보드 입력
-        for (int i = 0; i < 9; i++) {
-            String line = sc.next();
-            for (int j = 0; j < 9; j++) {
-                board[i][j] = line.charAt(j) - '0'; // 문자 → 숫자 변환
-            }
-        }
-        
-        sc.close();
-        solve(0, 0); // (0,0)부터 시작
+
     }
 
-    static void solve(int row, int col) {
-        // 다음 행으로 이동
-        if (col == 9) {
-            solve(row + 1, 0);
+    private static void dfs(int y, int x) {
+        if(x==9){
+            dfs(y+1,0);
             return;
         }
-        // 모든 행을 탐색하면 출력 후 종료
-        if (row == 9) {
+
+        if(y==9){
             printBoard();
             System.exit(0);
         }
 
-        // 빈 칸(0)이면 숫자 채우기 시도
-        if (board[row][col] == 0) {
-            for (int num = 1; num <= 9; num++) {
-                if (isValid(row, col, num)) {
-                    board[row][col] = num;
-                    solve(row, col + 1);
-                    board[row][col] = 0; // 백트래킹 (원상 복구)
+        if(board[y][x] == 0){
+            for(int num=1;num<10;num++){
+                if(checkI(y,num)&&checkJ(x,num)&&checkSmallBox(y,x,num)){
+                    board[y][x] = num;
+                    dfs(y,x+1);
+                    board[y][x] = 0;
                 }
             }
-        } else {
-            solve(row, col + 1); // 숫자가 이미 있으면 다음 칸 탐색
+        }else{
+            dfs(y,x+1);
         }
     }
 
-    // 유효성 검사 (행, 열, 3x3 박스 체크)
-    static boolean isValid(int row, int col, int num) {
-        // 같은 행, 같은 열에 숫자가 있는지 확인
-        for (int i = 0; i < 9; i++) {
-            if (board[row][i] == num || board[i][col] == num) return false;
+    private static boolean checkI(int i, int k) {
+        for(int t=0;t<9;t++){
+            if(board[i][t]==k)
+                return false;
         }
 
-        // 3x3 박스 내 숫자 확인
-        int startRow = (row / 3) * 3;
-        int startCol = (col / 3) * 3;
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (board[startRow + i][startCol + j] == num) return false;
-            }
-        }
         return true;
     }
 
-    // 스도쿠 출력
-    static void printBoard() {
+    private static boolean checkJ(int j, int k) {
+        for(int t=0;t<9;t++){
+            if(board[t][j]==k)
+                return false;
+        }
+
+        return true;
+    }
+
+    private static boolean checkSmallBox(int i, int j, int k) {
+        int iMin = (i/3)*3;
+        int jMin = (j/3)*3;
+
+        for(int p=iMin;p<iMin+3;p++){
+            for(int q=jMin;q<jMin+3;q++){
+                if(board[p][q]==k)
+                    return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static void setting() throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        for(int i=0;i<9;i++){
+            String[] split = br.readLine().split("");
+            for(int j=0;j<9;j++){
+                board[i][j] = Integer.parseInt(split[j]);
+            }
+        }
+    }
+
+    private static void printBoard() {
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 System.out.print(board[i][j]);
