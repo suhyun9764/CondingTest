@@ -19,62 +19,9 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         setting();
-        for (int i = 0; i < zero.length - 2; i++) {
-            int[] firstWall = zero[i];
-            map[firstWall[0]][firstWall[1]] = 1;
-            for (int j = i + 1; j < zero.length - 1; j++) {
-                int[] secondWall = zero[j];
-                map[secondWall[0]][secondWall[1]] = 1;
-                for (int k = j + 1; k < zero.length; k++) {
-                    // 1. 세개의 벽 세우기
-                    int[] thirdWall = zero[k];
-                    map[thirdWall[0]][thirdWall[1]] = 1;
-                    // 2. 바이러스 퍼뜨리기
-                    int virusResult = startVirus();
-                    // 3. 0인 공간 갯수 찾고 업데이트
-                    int safetyZone = (N * M) - wallNumber - virusResult - 3;
-                    answer = Math.max(answer, safetyZone);
-                    map[thirdWall[0]][thirdWall[1]] = 0;
-                }
-                map[secondWall[0]][secondWall[1]] = 0;
-            }
-            map[firstWall[0]][firstWall[1]] = 0;
-        }
-
+        simulation();
+//        combine(0,0);
         System.out.println(answer);
-    }
-
-    private static int startVirus() {
-        int[][] tempMap = new int[N][M];
-        for (int i = 0; i < N; i++) {
-            tempMap[i] = Arrays.copyOf(map[i], M);
-        }
-        int totalVirus = 0;
-        for (int i = 0; i < virus.length; i++) {
-            int[] currentVirus = virus[i];
-            totalVirus += bfs(currentVirus, tempMap);
-        }
-
-        return totalVirus;
-    }
-
-    private static int bfs(int[] initVirus, int[][] tempMap) {
-        Queue<int[]> queue = new ArrayDeque<>();
-        queue.offer(initVirus);
-        int cnt = 0;
-        while (!queue.isEmpty()) {
-            int[] virus = queue.poll();
-            cnt++;
-            for (int d = 0; d < 4; d++) {
-                int ny = virus[0] + dy[d];
-                int nx = virus[1] + dx[d];
-
-                if (ny < 0 || nx < 0 || ny >= N || nx >= M || tempMap[ny][nx] != 0) continue;
-                tempMap[ny][nx] = 2;
-                queue.offer(new int[]{ny, nx});
-            }
-        }
-        return cnt;
     }
 
     private static void setting() throws IOException {
@@ -118,6 +65,90 @@ public class Main {
                     virus[tempCnt++] = new int[]{i, j};
             }
         }
+    }
+    private static void simulation() {
+        for (int i = 0; i < zero.length - 2; i++) {
+            int[] firstWall = zero[i];
+            map[firstWall[0]][firstWall[1]] = 1;
+            for (int j = i + 1; j < zero.length - 1; j++) {
+                int[] secondWall = zero[j];
+                map[secondWall[0]][secondWall[1]] = 1;
+                for (int k = j + 1; k < zero.length; k++) {
+                    // 1. 세개의 벽 세우기
+                    int[] thirdWall = zero[k];
+                    map[thirdWall[0]][thirdWall[1]] = 1;
+                    // 2. 바이러스 퍼뜨리기
+                    int virusResult = startVirus();
+                    // 3. 0인 공간 갯수 찾고 업데이트
+                    getEachResult(virusResult);
+                    map[thirdWall[0]][thirdWall[1]] = 0;
+                }
+                map[secondWall[0]][secondWall[1]] = 0;
+            }
+            map[firstWall[0]][firstWall[1]] = 0;
+        }
+    }
+
+    private static void combine(int srcIdx, int idxNum) {
+        if(idxNum==3){
+            int virusResult = startVirus();
+            getEachResult(virusResult);
+        }
+
+        if(srcIdx == zero.length) return;
+        
+    }
+
+    private static void getEachResult(int virusResult) {
+        int safetyZone = (N * M) - wallNumber - virusResult - 3;
+        answer = Math.max(answer, safetyZone);
+    }
+
+    private static int startVirus() {
+        int[][] tempMap = new int[N][M];
+        for (int i = 0; i < N; i++) {
+            tempMap[i] = Arrays.copyOf(map[i], M);
+        }
+        int totalVirus = 0;
+        for (int i = 0; i < virus.length; i++) {
+            int[] currentVirus = virus[i];
+//            totalVirus += bfs(currentVirus, tempMap);
+            totalVirus += dfs(currentVirus,tempMap,0);
+        }
+
+        return totalVirus;
+    }
+
+    private static int dfs(int[] virus, int[][] tempMap, int cnt) {
+        int totalNum = 1;
+        for (int d = 0; d < 4; d++) {
+            int ny = virus[0] + dy[d];
+            int nx = virus[1] + dx[d];
+
+            if (ny < 0 || nx < 0 || ny >= N || nx >= M || tempMap[ny][nx] != 0) continue;
+            tempMap[ny][nx] = 2;
+            totalNum+= dfs(new int[]{ny,nx},tempMap,cnt);
+        }
+        return totalNum;
+    }
+
+    private static int bfs(int[] initVirus, int[][] tempMap) {
+        Queue<int[]> queue = new ArrayDeque<>();
+        queue.offer(initVirus);
+        int cnt = 0;
+        while (!queue.isEmpty()) {
+            int[] virus = queue.poll();
+            cnt++;
+            for (int d = 0; d < 4; d++) {
+                int ny = virus[0] + dy[d];
+                int nx = virus[1] + dx[d];
+
+                if (ny < 0 || nx < 0 || ny >= N || nx >= M || tempMap[ny][nx] != 0) continue;
+                tempMap[ny][nx] = 2;
+                queue.offer(new int[]{ny, nx});
+            }
+        }
+        return cnt;
     }
 
 }
