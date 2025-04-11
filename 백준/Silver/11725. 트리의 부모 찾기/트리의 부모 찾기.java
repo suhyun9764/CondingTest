@@ -1,3 +1,4 @@
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -5,39 +6,37 @@ import java.util.*;
 
 public class Main {
     static int N;
-//    static boolean[][] board;
-    static List[] lists;
     static int[] parents;
+    static List<Integer>[] nodes;
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        BufferedReader br =new BufferedReader(new InputStreamReader(System.in));
         N = Integer.parseInt(br.readLine());
-//        board = new boolean[N+1][N+1];
-        lists = new List[N+1];
-        for (int i=1;i<N+1;i++){
-            lists[i] = new ArrayList();
-        }
         parents = new int[N+1];
         Arrays.fill(parents,0);
-        parents[1] = 1;
+        nodes = new List[N+1];
+        for(int i=0;i<N+1;i++){
+            nodes[i] = new ArrayList();
+        }
+        StringTokenizer st;
         for(int i=0;i<N-1;i++){
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            int n1 = Integer.parseInt(st.nextToken());
-            int n2 = Integer.parseInt(st.nextToken());
-            lists[n1].add(n2);
-            lists[n2].add(n1);
-//            board[n1][n2] = true;
-//            board[n2][n1] = true;
+            st = new StringTokenizer(br.readLine());
+            int a = Integer.parseInt(st.nextToken());
+            int b= Integer.parseInt(st.nextToken());
+            nodes[a].add(b);
+            nodes[b].add(a);
         }
 
         Queue<Integer> queue = new ArrayDeque<>();
+        parents[1] =1;
         queue.offer(1);
         while (!queue.isEmpty()){
-            int current = queue.poll();
-            for(int i=0;i<lists[current].size();i++){
-                int node = (int) lists[current].get(i);
-                if(parents[node]==0){
-                    parents[node] = current;
-                    queue.offer(node);
+            int currentNode = queue.poll();
+            List<Integer> myNodes = nodes[currentNode];
+            for (Integer myNode : myNodes) {
+                if(parents[myNode]==0){
+                    parents[myNode] = currentNode;
+                    queue.offer(myNode);
                 }
             }
         }
