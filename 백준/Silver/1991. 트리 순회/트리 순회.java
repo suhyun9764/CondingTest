@@ -9,81 +9,82 @@ import java.util.StringTokenizer;
 public class Main {
     static int N;
     static Node[] nodes;
-
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         N = Integer.parseInt(br.readLine());
-        nodes = new Node[N];
+        nodes = new Node[N+1];
         StringTokenizer st;
-        for (int i = 0; i < N; i++) {
+        for(int i=0;i<N;i++){
             st = new StringTokenizer(br.readLine());
-            int root = st.nextToken().charAt(0) - 'A';
-            int left = st.nextToken().charAt(0) - 'A';
-            int right = st.nextToken().charAt(0) - 'A';
-            
-            if (isNotAlphabet(left)) {
-                left = -1;
+            int root = st.nextToken().charAt(0)-'A';
+            int leftChild = st.nextToken().charAt(0)-'A';
+            int rightChild = st.nextToken().charAt(0)-'A';
+            if(isNotAlphabet(leftChild)){
+                leftChild = -1;
             }
-            if (isNotAlphabet(right)) {
-                right = -1;
+
+            if(isNotAlphabet(rightChild)){
+                rightChild = -1;
             }
-            nodes[root] = new Node(root, left, right);
+            nodes[root] = new Node(root,leftChild,rightChild);
         }
-        
-        // 전위
         printPre(0);
         System.out.println();
-        // 중위
         printMid(0);
         System.out.println();
-        // 후위
-        printPost(0);
+        printLast(0);
 
     }
 
-    private static void printPre(int root) {
-        System.out.print((char)(root+'A'));
-        if(nodes[root].left==-1&&nodes[root].right==-1 )
-            return;
+    private static void printLast(int root) {
+        int leftChild = nodes[root].leftChild;
+        int rightChild = nodes[root].rightChild;
 
-        if(nodes[root].left!=-1)
-            printPre(nodes[root].left);
+        if(leftChild!=-1)
+            printLast(leftChild);
 
-        if(nodes[root].right!=-1)
-            printPre(nodes[root].right);
+        if(rightChild!=-1)
+            printLast(rightChild);
 
+        System.out.print((char) (root+'A'));
     }
 
     private static void printMid(int root) {
-        if(nodes[root].left==-1&&nodes[root].right==-1 ){
-            System.out.print((char)(root+'A'));
-            return;
-        }
+        int leftChild = nodes[root].leftChild;
+        int rightChild = nodes[root].rightChild;
 
+        if(leftChild!=-1)
+            printMid(leftChild);
 
-        if(nodes[root].left!=-1)
-            printMid(nodes[root].left);
+        System.out.print((char) (root+'A'));
 
-        System.out.print((char)(root+'A'));
-
-        if(nodes[root].right!=-1)
-            printMid(nodes[root].right);
+        if(rightChild!=-1)
+            printMid(rightChild);
     }
 
-    private static void printPost(int root) {
-        if(nodes[root].left==-1&&nodes[root].right==-1 ){
-            System.out.print((char)(root+'A'));
-            return;
+    private static void printPre(int root) {
+        System.out.print((char) (root+'A'));
+        int leftChild = nodes[root].leftChild;
+        int rightChild = nodes[root].rightChild;
+
+        if(leftChild!=-1)
+            printPre(leftChild);
+
+        if(rightChild!=-1)
+            printPre(rightChild);
+
+    }
+
+    static class Node{
+        int root;
+        int leftChild;
+        int rightChild;
+
+        public Node(int root, int leftChild, int rightChild) {
+            this.root = root;
+            this.leftChild = leftChild;
+            this.rightChild = rightChild;
         }
-
-
-        if(nodes[root].left!=-1)
-            printPost(nodes[root].left);
-
-        if(nodes[root].right!=-1)
-            printPost(nodes[root].right);
-
-        System.out.print((char)(root+'A'));
     }
 
     private static boolean isNotAlphabet(int input) {
@@ -93,15 +94,4 @@ public class Main {
         return false;
     }
 
-    static class Node {
-        int root;
-        int left;
-        int right;
-
-        public Node(int root, int left, int right) {
-            this.root = root;
-            this.left = left;
-            this.right = right;
-        }
-    }
 }
