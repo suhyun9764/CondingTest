@@ -1,83 +1,72 @@
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Queue;
+import java.util.StringTokenizer;
 
 public class Main {
-    // 상하좌우
-    static int[] dy = {-1,1,0,0};
-    static int[] dx = {0,0,-1,1};
-    static boolean isValid = true;
-    static int max = -1;
-
-    static int[][] container;
     static int N,M;
-
-    // 방문 여부
+    static int[][] box;
     static boolean[][] visit;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-
-        M = Integer.parseInt(st.nextToken());   // 가로
-        N = Integer.parseInt(st.nextToken());   // 세로
-
-        container = new int[N][M];
+        M = Integer.parseInt(st.nextToken());
+        N = Integer.parseInt(st.nextToken());
+        box = new int[N][M];
         visit = new boolean[N][M];
-
-        List<int[]> already = new ArrayList<>();
         for(int i=0;i<N;i++){
             st = new StringTokenizer(br.readLine());
-            for (int j=0;j<M;j++) {
-                int currentNum = Integer.parseInt(st.nextToken());
-                if(currentNum==1)
-                    already.add(new int[]{i,j});
-                container[i][j] = currentNum;
+            for(int j=0;j<M;j++){
+                box[i][j] = Integer.parseInt(st.nextToken());
             }
         }
-        bfs(already);
-
+        Queue<int[]> queue = new ArrayDeque<>();
         for(int i=0;i<N;i++){
             for(int j=0;j<M;j++){
-                if(container[i][j]==0)
-                    isValid=false;
-                if(container[i][j]>max)
-                    max = container[i][j];
+                if(box[i][j]==1)
+                    queue.add(new int[]{i,j});
             }
-            if (!isValid)
-                break;
-        }
-        if(!isValid) {
-            System.out.println(-1);
-            return;
-        }
-
-        System.out.println(max-1);
-    }
-
-    private static void bfs(List<int[]> already) {
-        Queue<int[]> queue = new ArrayDeque<>();
-        for (int[] position : already) {
-            queue.offer(position);
-            visit[position[0]][position[1]] = true;
         }
 
         while (!queue.isEmpty()){
-            int[] currentPosition = queue.poll();
-            int y = currentPosition[0];
-            int x = currentPosition[1];
-            visit[y][x] =true;
+            int[] current = queue.poll();
+            int y = current[0];
+            int x = current[1];
+            int count = box[y][x];
+            int[] dy = {-1,1,0,0};
+            int[] dx = {0,0,-1,1};
 
-            for(int i=0;i<4;i++){
-                int ny = y+dy[i];
-                int nx = x+dx[i];
+            for(int d=0;d<4;d++){
+                int ny = y +dy[d];
+                int nx = x +dx[d];
 
-                if(ny<0||nx<0||ny>=N||nx>=M||container[ny][nx]==1||container[ny][nx]==-1||visit[ny][nx]) continue;
-                container[ny][nx] = container[y][x]+1;
-                visit[ny][nx] = true;
-                queue.offer(new int[]{ny,nx});
+                if(ny<0||nx<0||ny>=N||nx>=M||box[ny][nx]!=0)continue;
+                box[ny][nx] = count+1;
+                queue.add(new int[]{ny,nx});
+            }
+
+        }
+
+        boolean isComplete = true;
+        int answer =0;
+        for(int i=0;i<N;i++){
+            if(!isComplete)
+                break;
+            for(int j=0;j<M;j++){
+                if(box[i][j]==0){
+                    answer=0;
+                    isComplete=false;
+                    break;
+                }
+                answer = Math.max(answer,box[i][j]);
             }
         }
-    }
 
+        System.out.println(answer-1);
+
+
+    }
 }
