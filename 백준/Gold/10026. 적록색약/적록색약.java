@@ -2,93 +2,66 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 public class Main {
-	private static StringTokenizer st;
-	private static BufferedReader br;
-	private static int N;
-	private static char[][] map;
-	private static boolean[][] visited;
-	public static void main(String[] args) throws IOException {
-		br = new BufferedReader(new InputStreamReader(System.in));
-		N = Integer.parseInt(br.readLine());
-		map = new char[N][N];
+    static int N;
+    static char[][] map;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        N = Integer.parseInt(br.readLine());
+        map = new char[N][N];
+        for(int i=0;i<N;i++){
+            map[i] = br.readLine().toCharArray();
+        }
+        look();
+        changeMap();    // 색약 모드로 변경
+        look();    
+    }
 
-		for(int i=0;i<N;i++){
-			st = new StringTokenizer(br.readLine());
-			map[i] = st.nextToken().toCharArray();
-		}
+    private static void look() {
+        boolean[][] visit = new boolean[N][N];
+        int count = 0;
+        for(int i=0;i<N;i++){
+            for(int j=0;j<N;j++){
+                if(visit[i][j]) continue;
+                bfs(i,j,visit);
+                count++;
+            }
+        }
+        System.out.println(count);
+    }
 
-		normal();
-		blindness();
-	}
+    private static void bfs(int y, int x, boolean[][] visit) {
+        Queue<int[]> queue = new ArrayDeque<>();
+        queue.add(new int[]{y,x});
+        visit[y][x] = true;
 
-	private static void blindness() {
-		visited = new boolean[N][N];
-		for(int i=0;i<N;i++){
-			for(int j=0;j<N;j++){
-				if(map[i][j]=='R')
-					map[i][j]='G';
-			}
-		}
+        while (!queue.isEmpty()){
+            int[] poll = queue.poll();
+            char currentColor = map[poll[0]][poll[1]];
+            int[] dy = {-1,1,0,0};
+            int[] dx = {0,0,-1,1};
+            for(int d=0;d<4;d++){
+                int ny = poll[0]+dy[d];
+                int nx = poll[1]+dx[d];
+                if(ny<0||nx<0||ny>=N||nx>=N||visit[ny][nx]||map[ny][nx]!=currentColor) continue;
+                visit[ny][nx] = true;
+                queue.offer(new int[]{ny,nx});
+            }
+        }
+    }
 
 
-		int answer = 0;
-		for(int i=0;i<N;i++){
-			for(int j=0;j<N;j++){
-				if (visited[i][j]==false) {
-					dfs(i,j);
-					answer++;
-				}
-			}
-		}
+    private static void changeMap() {
+        for(int i=0;i<N;i++){
+            for(int j=0;j<N;j++){
+                int currentColor = map[i][j];
+                if(currentColor=='G')
+                    map[i][j] = 'R';
+            }
+        }
+    }
 
-		System.out.println(answer);
-	}
-
-	private static void normal() {
-		visited = new boolean[N][N];
-		int answer = 0;
-		for(int i=0;i<N;i++){
-			for(int j=0;j<N;j++){
-				if (visited[i][j]==false) {
-					dfs(i,j);
-					answer++;
-				}
-			}
-		}
-
-		System.out.println(answer);
-	}
-
-	private static void dfs(int i, int j) {
-		List<int[]> nearSameColors = findSameColor(i,j);
-		if(nearSameColors.isEmpty())
-			return;
-
-		for (int[] nearSameColor : nearSameColors) {
-			dfs(nearSameColor[0],nearSameColor[1]);
-		}
-
-	}
-
-	private static List<int[]> findSameColor(int i, int j) {
-		char currentColor = map[i][j];
-		int x[] = {0,-1,0,1};
-		int y[] = {1,0,-1,0};
-		List<int[]> nearSameColors = new ArrayList<>();
-		for(int t=0;t<4;t++){
-			if(0<=i+y[t]&&i+y[t]<map.length&&0<=j+x[t]&&j+x[t]<map[0].length){
-				if(map[i+y[t]][j+x[t]]==currentColor&&visited[i+y[t]][j+x[t]]==false){
-					nearSameColors.add(new int[]{i+y[t],j+x[t]});
-					visited[i+y[t]][j+x[t]] = true;
-				}
-			}
-		}
-
-		return nearSameColors;
-	}
 }
