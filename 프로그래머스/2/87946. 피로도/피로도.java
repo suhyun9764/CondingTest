@@ -1,22 +1,23 @@
 class Solution {
-    static int[][] dungeons;
+    int answer = 0;
+    int[][] stDungeons;
+    boolean[] visit;
     public int solution(int k, int[][] dungeons) {
-        this.dungeons = dungeons;
-        boolean visit[] = new boolean[dungeons.length];
-        return dfs(k,visit,0);
+        stDungeons = dungeons;
+        visit = new boolean[dungeons.length];
+        dfs(k,0);
+        return answer;
     }
     
-    int dfs(int k, boolean[] visit, int depth){
-        int max = depth;
-        for(int i=0;i<dungeons.length;i++){
-            if(visit[i]) continue;
-            int minTired = dungeons[i][0];
-            if(k<minTired) continue;
-            int consumeTired = dungeons[i][1];
-            visit[i] = true;
-            max = Math.max(max,dfs(k-consumeTired,visit,depth+1));
-            visit[i] = false;
+    void dfs(int k, int total){
+        answer = Math.max(answer,total);
+        
+        for(int i=0;i<visit.length;i++){
+            if(!visit[i] && k>=stDungeons[i][0]){
+                visit[i] = true;
+                dfs(k-stDungeons[i][1],total+1);
+                visit[i] = false;
+            }
         }
-        return max;
     }
 }
