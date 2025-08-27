@@ -1,61 +1,43 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.Arrays;
+import java.util.StringTokenizer;
 
 public class Main {
-
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int N = Integer.parseInt(br.readLine());
+        int[] arr = new int[N];
+
         StringTokenizer st = new StringTokenizer(br.readLine());
-        int n = Integer.parseInt(st.nextToken());
-        int[] arr = new int[n];
-        st = new StringTokenizer(br.readLine());
-        for(int i=0;i<n;i++){
+        for(int i=0;i<N;i++){
             arr[i] = Integer.parseInt(st.nextToken());
         }
+
         Arrays.sort(arr);
 
-        int ansAbs = 2000000000;
-        int ans1 = 0;
-        int ans2 = 0;
-        for(int i=0;i<n-1;i++){
-            int pairValue = findOptimalPairValue(arr,i+1,n-1,arr[i]);
-            int abs = Math.abs(arr[i]+pairValue);
-            if(abs<ansAbs) {
-                ansAbs = abs;
-                ans1 = arr[i];
-                ans2 = pairValue;
+        int left = 0;
+        int right = N-1;
+        int min = Integer.MAX_VALUE;
+        int leftAnswer = left;
+        int rightAnswer = right;
+        while(left<right){
+            int sum = arr[left]+arr[right];
+            if(Math.abs(sum)<min){
+                min = Math.abs(sum);
+                leftAnswer = left;
+                rightAnswer = right;
             }
+            if(sum==0) break;
+            if(sum>0){
+                right--;
+                continue;
+            }
+            left++;
+
         }
 
-        System.out.println(ans1+" "+ans2);
-    }
-
-    private static int findOptimalPairValue(int[] arr, int startIndex, int endIndex,int value) {
-        
-        int optimalPairValue = 0;
-        int start = startIndex;
-        int end = endIndex;
-        int optimalPariAbs =2000000000;
-         while(start<=end){
-             int m = (start+end)/2;
-             int sum = value+arr[m];
-             int sumAbs = Math.abs(sum);
-             if(sumAbs<optimalPariAbs){
-                 optimalPairValue = arr[m];
-                 optimalPariAbs = sumAbs;
-             }
-             if(sum<0) {
-                 start = m+1;
-             }
-             else if(sum>0){
-                 end = m-1;
-             }
-             else
-                 return optimalPairValue;
-         }
-
-         return optimalPairValue;
+        System.out.println(arr[leftAnswer]+" "+arr[rightAnswer]);
     }
 }
