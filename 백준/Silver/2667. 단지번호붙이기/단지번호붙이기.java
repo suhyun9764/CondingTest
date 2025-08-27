@@ -1,65 +1,61 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Main {
     static int N;
-    static int[][] map;
     static boolean[][] visit;
-
+    static int[][] map;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         N = Integer.parseInt(br.readLine());
+
         map = new int[N][N];
         visit = new boolean[N][N];
 
         for(int i=0;i<N;i++){
-            String[] split = br.readLine().split("");
-            for(int j=0;j<N;j++){
-                map[i][j] = Integer.parseInt(split[j]);
+            char[] charArray = br.readLine().toCharArray();
+            for(int j=0;j<charArray.length;j++){
+                map[i][j] = charArray[j]-'0';
             }
         }
-        Queue<Integer> answer = new PriorityQueue<>();
+
+        List<Integer> answer = new ArrayList<>();
         for(int i=0;i<N;i++){
             for(int j=0;j<N;j++){
-                if (map[i][j]==0||visit[i][j]) continue;
-                answer.add(bfs(i,j));
+                if(map[i][j]==1&&!visit[i][j]) {
+                    visit[i][j] =true;
+                    answer.add(dfs(i, j));
+                }
             }
         }
+
+        Collections.sort(answer);
         System.out.println(answer.size());
-        while (!answer.isEmpty())
-            System.out.println(answer.poll());
-
-
+        for(int i=0;i<answer.size();i++){
+            System.out.println(answer.get(i));
+        }
     }
 
-    private static Integer bfs(int i, int j ) {
-        int count = 1;
-        Queue<int[]> queue = new ArrayDeque<>();
-        queue.add(new int[]{i,j});
-        visit[i][j] = true;
+    private static int dfs(int y, int x) {
+        int sum = 1;
+        int[] dy = {-1,1,0,0};
+        int[] dx = {0,0,-1,1};
 
-        while (!queue.isEmpty()){
-            int[] current = queue.poll();
-            int y = current[0];
-            int x = current[1];
+        for(int d=0;d<4;d++){
+            int ny = y+dy[d];
+            int nx = x+dx[d];
 
-            int[] dy = {-1,1,0,0};
-            int[] dx = {0,0,-1,1};
-
-            for(int d=0;d<4;d++){
-                int ny = y+dy[d];
-                int nx = x+dx[d];
-
-                if(ny<0||nx<0||ny>=N||nx>=N||map[ny][nx]==0||visit[ny][nx]) continue;
+            if(ny<0||ny>=N||nx<0||nx>=N) continue;
+            if(map[ny][nx]==1&&!visit[ny][nx]){
                 visit[ny][nx] = true;
-                queue.offer(new int[]{ny,nx});
-                count++;
+                sum+=dfs(ny,nx);
             }
         }
 
-        return count;
+        return sum;
     }
 }
