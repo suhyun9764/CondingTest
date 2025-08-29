@@ -32,13 +32,16 @@ public class Main {
 		while (left<=right){
 			int mid = (left+right)/2;
 			long total = cut(mid,arr);
-			if(total>=m){
+			if(total>m){
 				left = mid+1;
 				answer = mid;
-			}else {
+			}else if(total<m){
 				right = mid - 1;
-				}
+			}else{
+				answer = mid;
+				break;
 			}
+		}
 
 		System.out.println(answer);
 	}
