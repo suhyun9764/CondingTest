@@ -1,48 +1,55 @@
-import java.io.*;
-import java.util.Arrays;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 public class Main {
+	public static void main(String[] args) throws IOException {
+		// 0(left) 과 최대값(right)의 절반 구하기 : mid
+		// 절반으로 자르고 가져가는 값 구하기
+		// 만약 가져가는값이 M보다 크다면 left = mid
+		// 만약 가져가는값이 M보다 작다면 RIGHT = MID
 
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
 
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        int n = Integer.parseInt(st.nextToken());
-        int m= Integer.parseInt(st.nextToken());
+		int n = Integer.parseInt(st.nextToken());
+		int m = Integer.parseInt(st.nextToken());
+		int[] arr = new int[n];
+		st = new StringTokenizer(br.readLine());
 
-        int[] arr = new int[n];
+		int max = 0;
+		for(int i=0;i<n;i++){
+			int value = Integer.parseInt(st.nextToken());
+			arr[i] = value;
+			if(value>max)
+				max=value;
+		}
 
-        st = new StringTokenizer(br.readLine());
-        for(int i=0;i<n;i++){
-            arr[i] = Integer.parseInt(st.nextToken());
-        }
-        Arrays.sort(arr);
-        int start =0;
-        int end = arr[arr.length-1];
-        int ans =0;
-        while(start<=end){
-            int mid = (start+end)/2;
-            long totalLength = cutTree(arr,mid);
-            if(totalLength<m){
-                end = mid-1;
-            }else{
-                start = mid+1;
-                ans = mid;
-            }
-        }
+		int left = 0;
+		int right = max;
+		int answer = 0;
+		while (left<=right){
+			int mid = (left+right)/2;
+			long total = cut(mid,arr);
+			if(total>=m){
+				left = mid+1;
+				answer = mid;
+			}else {
+				right = mid - 1;
+				}
+			}
 
-        System.out.println(ans);
-    }
+		System.out.println(answer);
+	}
 
-    private static long cutTree(int[] arr, int mid) {  // O(N)
-        long total=0;
-        for(int i=0;i<arr.length;i++){
-            int bufLength = arr[i]-mid;
-            if(bufLength<0)
-                bufLength=0;
-            total +=bufLength;
-        }
-        return total;
-    }
+	private static long cut(int mid, int[] arr) {
+		long total = 0;
+		for (int i : arr) {
+			if(i-mid>=0){
+				total += i-mid;
+			}
+		}
+		return total;
+	}
 }
