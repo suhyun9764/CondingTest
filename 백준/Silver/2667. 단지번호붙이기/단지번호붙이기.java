@@ -6,56 +6,53 @@ import java.util.Collections;
 import java.util.List;
 
 public class Main {
-    static int N;
+    static char[][] map;
     static boolean[][] visit;
-    static int[][] map;
+    static int[] dy = {-1, 1, 0, 0};
+    static int[] dx = {0, 0, -1, 1};
+    static int n;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        N = Integer.parseInt(br.readLine());
+        n = Integer.parseInt(br.readLine());
+        map = new char[n][n];
+        visit = new boolean[n][n];
 
-        map = new int[N][N];
-        visit = new boolean[N][N];
-
-        for(int i=0;i<N;i++){
-            char[] charArray = br.readLine().toCharArray();
-            for(int j=0;j<charArray.length;j++){
-                map[i][j] = charArray[j]-'0';
-            }
+        for (int i = 0; i < n; i++) {
+            map[i] = br.readLine().toCharArray();
         }
 
-        List<Integer> answer = new ArrayList<>();
-        for(int i=0;i<N;i++){
-            for(int j=0;j<N;j++){
-                if(map[i][j]==1&&!visit[i][j]) {
-                    visit[i][j] =true;
-                    answer.add(dfs(i, j));
+        List<Integer> answerList = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (map[i][j] == '1' && !visit[i][j]) {
+                    visit[i][j] = true;
+                    int total = dfs(i, j);
+                    answerList.add(total);
                 }
             }
         }
 
-        Collections.sort(answer);
-        System.out.println(answer.size());
-        for(int i=0;i<answer.size();i++){
-            System.out.println(answer.get(i));
+        Collections.sort(answerList);
+        System.out.println(answerList.size());
+        for(int answer : answerList){
+            System.out.println(answer);
         }
+
     }
 
-    private static int dfs(int y, int x) {
-        int sum = 1;
-        int[] dy = {-1,1,0,0};
-        int[] dx = {0,0,-1,1};
+    private static int dfs(int i, int j) {
+        int total = 1;
 
-        for(int d=0;d<4;d++){
-            int ny = y+dy[d];
-            int nx = x+dx[d];
+        for (int d = 0; d < 4; d++) {
+            int ny = i + dy[d];
+            int nx = j + dx[d];
 
-            if(ny<0||ny>=N||nx<0||nx>=N) continue;
-            if(map[ny][nx]==1&&!visit[ny][nx]){
+            if(ny<0||nx<0||ny>=n||nx>=n||visit[ny][nx]) continue;
+            if(map[ny][nx]=='1') {
                 visit[ny][nx] = true;
-                sum+=dfs(ny,nx);
+                total += dfs(ny, nx);
             }
         }
-
-        return sum;
+        return total;
     }
 }
