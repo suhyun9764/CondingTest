@@ -6,46 +6,46 @@ import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main {
-    static int[][] map;
+    static int[] dy = {-1, 1, 0, 0};
+    static int[] dx = {0, 0, -1, 1};
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        int N = Integer.parseInt(st.nextToken());
-        int M = Integer.parseInt(st.nextToken());
-        map = new int[N][M];
 
-        for (int i = 0; i < N; i++) {
+        int n = Integer.parseInt(st.nextToken());
+        int m = Integer.parseInt(st.nextToken());
+
+        int[][] map = new int[n][m];
+        for (int i = 0; i < n; i++) {
             char[] charArray = br.readLine().toCharArray();
-            for (int j = 0; j < charArray.length; j++) {
-                map[i][j] = Integer.parseInt(String.valueOf(charArray[j]));
+            for (int j = 0; j < m; j++) {
+                map[i][j] = charArray[j] - '0';
             }
         }
 
         Queue<int[]> queue = new ArrayDeque<>();
         queue.add(new int[]{0, 0});
-
+        int answer = 0;
         while (!queue.isEmpty()) {
             int[] cur = queue.poll();
-            int curY = cur[0];
-            int curX = cur[1];
+            int y = cur[0];
+            int x = cur[1];
 
-            if (curY == N - 1 && curX == M - 1) {
-                System.out.println(map[curY][curX]);
+            if (y == n - 1 && x == m - 1) {
+                answer = map[y][x];
                 break;
             }
-
-            int[] dy = {-1, 1, 0, 0};
-            int[] dx = {0, 0, -1, 1};
-
             for (int d = 0; d < 4; d++) {
-                int ny = curY + dy[d];
-                int nx = curX + dx[d];
+                int ny = y + dy[d];
+                int nx = x + dx[d];
 
-                if (ny < 0 || ny >= N || nx < 0 || nx >= M || map[ny][nx] != 1) continue;
-                map[ny][nx] = map[curY][curX] + 1;
+                if (ny < 0 || ny >= n || nx < 0 || nx >= m || map[ny][nx] != 1) continue;
+                map[ny][nx] = map[y][x] + 1;
                 queue.add(new int[]{ny, nx});
             }
         }
+
+        System.out.println(answer);
     }
 }
