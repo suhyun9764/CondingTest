@@ -1,39 +1,31 @@
 import java.util.*;
 
 class Solution {
-        public int solution(int cacheSize, String[] cities) {
-            List<String> list = new LinkedList<>();
-            int answer = 0;
-            int currentCacheSize = 0;
-            if(cacheSize==0){
-                return cities.length*5;
-            }
-
-            for(String originCity : cities){
-                String city = originCity.toLowerCase();
-                // 새로 들어온 경우
-                if(list.contains(city)){
-                    for(int i=0;i<list.size();i++){
-                        if(list.get(i).equals(city)){
-                            list.add(list.remove(i));
-                            break;
-                        }
-                    }
-                    answer+=1;
-                }
-                // 이미 있는 경우
-                else{
-                    // 캐시가 남아있는 경우
-                    if(currentCacheSize<cacheSize){
-                        currentCacheSize++;
-                    }else{// 캐시가 가득찬 경우
-                        list.remove(0);
-                    }
-                    list.add(city);
-                    answer+=5;
-                }
+    public int solution(int cacheSize, String[] cities) {
+        // 메인 아이디어 : order(사용된 순서)이 낮을수록 큐의 맨앞에 위치 
+        // Map을 사용하여 현재 캐시상태 관리
+        // queue에서 Pop될때 map에서도 삭제
+        int answer = 0;
+        LinkedList<String> cache = new LinkedList<>();
+        for(int i=0;i<cities.length;i++){
+            String currentCity = cities[i].toLowerCase();
+            if(cache.remove(currentCity)){
+                cache.addLast(currentCity);
+                answer++;
+                continue;
             }
             
-            return answer;
+            if(cacheSize!=0&&cache.size()==cacheSize){
+                cache.removeFirst();
+            }
+            
+            if(cacheSize!=0){
+                cache.addLast(currentCity);
+            }
+            
+            answer+=5;
         }
+        
+        return answer;
     }
+}
