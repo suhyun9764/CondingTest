@@ -1,55 +1,44 @@
 import java.util.*;
 
 class Solution {
-    public int[] solution(String msg) {
-        Map<String, Integer> map = new HashMap<>();
-        char[] charArray = msg.toCharArray();
-        
-        int indexNum = 27;
-        // charArray로 변환 후 순회
-        List<Integer> answer = new ArrayList<>();
-        
-        StringBuilder sb = new StringBuilder();
-        for(int i=0;i<charArray.length;){
-            int currentI = i;
-            if(i==charArray.length-1){
-                answer.add(charArray[i++]-'A'+1);
-                continue;
+        public int[] solution(String msg) {
+            // msg 순회
+            // 현재 인덱스가 사전에 등록되어있을때까지 sb에 append
+            // sb를 통해 인덱스값 출력, 그리고 그 다음글자는 마지막인덱스에 저장
+            Map<String, Integer> map = new HashMap<>();
+            for(int i=1;i<27;i++){
+                map.put(String.valueOf((char)('A'+i-1)),i);
+                // System.out.println(String.valueOf((char)('A'+i-1)));
             }
-            Integer indexValue = null;
-            sb.append(charArray[i++]);
-            sb.append(charArray[i]);
-    
-            while(map.containsKey(sb.toString())){
-                indexValue = map.get(sb.toString());
-                if(i+1==charArray.length){
+            char[] arr = msg.toCharArray();
+            int index = 27;
+            List<Integer> answerList = new ArrayList<>();
+
+            int i=0;
+            while(i<msg.length()){
+                StringBuilder sb = new StringBuilder();
+                while(map.containsKey(sb.toString()+arr[i])){
+                    System.out.println(i);
+                    System.out.println(sb.toString()+arr[i]);
+                    sb.append(arr[i]);
+
                     i++;
-                    break;
+                    if(i==msg.length())
+                        break;
                 }
-                sb.append(charArray[++i]);
-            }
-            
-            if(indexValue==null){
-                answer.add(charArray[currentI]-'A'+1);
-            }else{
-                answer.add(indexValue);
-            }
-            
-            map.put(sb.toString(),indexNum++);
-            sb.setLength(0);
-        }
+                answerList.add(map.get(sb.toString()));
+                if(i==msg.length())
+                    break;;
+                map.put(sb.append(arr[i]).toString(),index++);
 
-        int[] answerArray = new int[answer.size()];
-        for(int i=0;i<answer.size();i++){
-            answerArray[i] = answer.get(i);
-        }
-        
-        return answerArray;
+            }
 
-  
-                   // sb.toString()이 사전에 있을때까지 반복
-        // 색인이있다면 색인출력 없다면 첫글자 출력
-        // 다음글자가 있다면 현재 글자 + 다음글자를 map에 현재 인덱스에 저장
-        
+            int[] answer = new int[answerList.size()];
+            for(int t=0;t<answerList.size();t++){
+                answer[t] = answerList.get(t);
+                // System.out.println(answerList.get(i));
+            }
+
+            return answer;
+        }
     }
-}
