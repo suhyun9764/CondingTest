@@ -1,52 +1,61 @@
 import java.util.*;
 
-
 class Solution {
-        public String[] solution(String[] record) {
-            // 채팅방에 있는 유저 목록
-            Map<String, String> users = new HashMap();
-            // 출입 로그
-            String[][] log = new String[record.length][2];
-            int logSize = 0;    // 로그에 추가될 때 마다 +1
-            // record 순회
-            for (String userAction : record) {
-                String[] section = userAction.split(" ");
-                // 정보 추출
-                String action = section[0];
-                // 들어왔을 때
-                if (action.equals("Enter")) {
-                    String uid = section[1];
-                    String nickName = section[2];
-                    log[logSize][0] = uid;
-                    log[logSize][1] = action;
-                    logSize++;
-                    users.put(uid,nickName);
-                } else if (action.equals("Leave")) {   // 나갈 때
-                    String uid = section[1];
-                    log[logSize][0] = uid;
-                    log[logSize][1] = action;
-                    logSize++;
-                } else {// 닉네임 변경할 때
-                    String uid = section[1];
-                    String nickName = section[2];
-                    users.put(uid,nickName);
-                }
+
+        class Log{
+            String uid;
+            String order;
+
+            public Log(String uid, String order) {
+                this.uid = uid;
+                this.order = order;
             }
 
-            String[] answer = new String[logSize];
-            for(int i=0;i<answer.length;i++){
-                String[] currentLog = log[i];
-                String uid = currentLog[0];
-                String action = currentLog[1];
-                String nickName= users.get(uid);
+            public String toPrint(String nickName){
+                if(order.equals("Enter"))
+                    return nickName+"님이 들어왔습니다.";
 
-                if(action.equals("Enter")){
-                    answer[i] = nickName+"님이 들어왔습니다.";
-                }else{
-                    answer[i] = nickName+"님이 나갔습니다.";
+                return nickName+"님이 나갔습니다.";
+            }
+        }
+
+
+        public String[] solution(String[] record) {
+            // map에 uuid, 닉네임 저장
+            // log클래스 만들기 (uuid, 동작)
+            // record 파싱 방법
+            /*
+            1. 공백으로 분리
+            2. Enter, Change라면 필드 3개, 아니면 2개
+            3. 첫번째는 무조건 동작, 두번째는 아이디, 세번째는 닉네임
+             */
+            Map<String,String> map = new HashMap<>();
+            List<Log> list = new ArrayList<>();
+            for(int i=0;i<record.length;i++){
+                String[] fields = record[i].split(" ");
+                String order = fields[0];
+                String uid = fields[1];
+                String nickname = null;
+                if(fields.length==3)
+                    nickname = fields[2];
+
+                if(order.equals("Change")){
+                    map.put(uid,nickname);
+                    continue;
                 }
+
+                list.add(new Log(uid,order));
+                if(order.equals("Enter"))
+                    map.put(uid,nickname);
+
+            }
+            String[] answer = new String[list.size()];
+            for(int i=0;i<answer.length;i++){
+                Log log = list.get(i);
+                answer[i] = log.toPrint(map.get(log.uid));
             }
 
             return answer;
+
         }
     }
