@@ -1,72 +1,81 @@
-
 import java.util.*;
 
-class Solution {
-        static String[] answer;
-        static List<String> selectedMenuCombines = new ArrayList<>();
+class Combination{
+        String combination;
+        int cnt;
+
+        public Combination(String combination, int cnt) {
+            this.combination = combination;
+            this.cnt = cnt;
+        }
+    }
+      class Solution {
+
+
         public String[] solution(String[] orders, int[] course) {
-            // course 순회
-            for (int menuNumber : course) {
-                // orders 순회
-                HashMap<String, Integer> menuCombinesMap = new HashMap<>();
-                for (String order : orders) {
-                    // 각 course의 메뉴 수만큼 각 order에서 조합하여 map에 <메뉴조합 문자열, 횟수> 저장하기
-                    menuCombinesMap = getCombineResult(order,menuCombinesMap,menuNumber);
+            List<String> answers = new ArrayList<>();
+                       for(int i=0;i<orders.length;i++){
+                String cur = orders[i];
+                char[] charArray = cur.toCharArray();
+                Arrays.sort(charArray);
+                StringBuilder sb = new StringBuilder();
+                for(char c : charArray){
+                    sb.append(c);
                 }
-                // map 순회하며 우선순위 큐에 횟수순대로 저장하기
-                PriorityQueue<MenuCombine> queue = new PriorityQueue<>((a,b)->b.num-a.num);
-                for (Map.Entry<String, Integer> menuCombine : menuCombinesMap.entrySet()) {
-                    queue.add(new MenuCombine(menuCombine.getKey(),menuCombine.getValue()));
+
+                orders[i] = sb.toString();
+            }
+            for(int target : course){
+                List<Combination> list = new ArrayList<>();
+                Map<String,Integer> map = new HashMap();
+                for(String order : orders){
+                    comb(order,target, map);
                 }
-                // 큐에서 가장 처음꺼를 꺼내고 그것과 같은 횟수의 메뉴조합을 answer에 저장
-                // 단 주문횟수가 2번이상만
-                if(queue.isEmpty()) continue;
-                MenuCombine menuCombine = queue.poll();
-                int maxNumber = menuCombine.num;
-                if(maxNumber>=2){
-                    selectedMenuCombines.add(menuCombine.menus);
-                    while (!queue.isEmpty()&&queue.peek().num==maxNumber){
-                        selectedMenuCombines.add(queue.poll().menus);
-                    }
+
+                for(Map.Entry<String, Integer> combination : map.entrySet()){
+                    list.add(new Combination(combination.getKey(),combination.getValue()));
                 }
+
+                Collections.sort(list,(a,b)->{
+                    if(a.cnt==b.cnt)
+                        return a.combination.compareTo(b.combination);
+
+                    return b.cnt-a.cnt;
+                });
+
+                if(list.isEmpty()) continue;
+                Combination max = list.get(0);
+                         if(max.cnt<2)
+                    continue;
+                answers.add(max.combination);
+                for(int i=1;i<list.size();i++){
+                    if(list.get(i).cnt==max.cnt)
+                        answers.add(list.get(i).combination);
+                }
+            }
+            String[] answer = new String[answers.size()];
+            for(int i=0;i<answers.size();i++){
+                answer[i] = answers.get(i);
             }
 
-            Collections.sort(selectedMenuCombines);
-            answer = new String[selectedMenuCombines.size()];
-            for(int i=0;i<answer.length;i++){
-                answer[i] = selectedMenuCombines.get(i);
-            }
+            Arrays.sort(answer);
 
             return answer;
         }
-
-        private HashMap<String, Integer> getCombineResult(String order, HashMap<String, Integer> menuCombinesMap, int menuNumber) {
+        
+        private void comb(String order, int n, Map<String,Integer> map) {
             char[] charArray = order.toCharArray();
-            Arrays.sort(charArray);
-            combine(charArray,new StringBuilder(),0,menuCombinesMap,menuNumber);
-            return menuCombinesMap;
-        }
-
-        private void combine(char[] charArray, StringBuilder sb, int start,HashMap<String, Integer> menuCombinesMap, int menuNumber) {
-            if(sb.length()==menuNumber){
-                String menuCombine = sb.toString();
-                menuCombinesMap.put(menuCombine,menuCombinesMap.getOrDefault(menuCombine,0)+1);
-                return;
-            }
-            for(int i=start;i<charArray.length;i++){
-                sb.append(charArray[i]);
-                combine(charArray, sb,i+1,menuCombinesMap, menuNumber);
-                sb.deleteCharAt(sb.length()-1);
+            for(int i=0;i<order.length()-n+1;i++){
+                dfs(i,1,n,map,charArray,String.valueOf(charArray[i]));
             }
         }
 
-        static class MenuCombine{
-            String menus;
-            int num;
+        private void dfs(int i, int length, int n, Map<String, Integer> map, char[] charArray, String str) {
+            if(length==n)
+                map.put(str,map.getOrDefault(str,0)+1);
 
-            public MenuCombine(String menus, int num) {
-                this.menus = menus;
-                this.num = num;
+            for(int j=i+1;j<charArray.length;j++) {
+                dfs(j, length + 1, n, map, charArray, str + charArray[j]);
             }
         }
     }
