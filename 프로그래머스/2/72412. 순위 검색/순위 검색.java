@@ -1,65 +1,96 @@
 import java.util.*;
 
 class Solution {
-        Map<String, List<Integer>> map = new HashMap<>();
 
         public int[] solution(String[] info, String[] query) {
-            // 1. info → 모든 조합을 key로 저장
-            for (String s : info) {
-                String[] split = s.split(" ");
-                String[] conditions = new String[]{split[0], split[1], split[2], split[3]};
-                int score = Integer.parseInt(split[4]);
+            // map에 가능한 모든 문자열 형태로 저장(점수)
+            // map순회하며 각 리스트 모두 정렬
+            // 해당 쿼리 조건에 맞는 map의 리스트에서 일정 이상점수가 몇개인지 구하기 (이분탐색)
 
-                // 16가지 경우의 수 (- 포함)
-                dfs(conditions, 0, "", score);
+            Map<String, List<Integer>> map = new HashMap<>();
+
+            for(int i=0;i<info.length;i++){
+                String[] curField = info[i].split(" ");
+                saveToMap(curField,map);
             }
 
-            // 2. 각 리스트 정렬 (이분 탐색을 위해)
-            for (List<Integer> list : map.values()) {
+            for(List<Integer> list : map.values()){
                 Collections.sort(list);
             }
 
-            // 3. query 처리
             int[] answer = new int[query.length];
-            for (int i = 0; i < query.length; i++) {
-                String q = query[i].replaceAll(" and ", " ");
-                String[] split = q.split(" ");
-                String key = split[0] + split[1] + split[2] + split[3];
-                int score = Integer.parseInt(split[4]);
+            for(int i=0;i<query.length;i++){
+                String strQuery = getStrQuery(query[i]);
+                int score = getScore(query[i]);
+                List<Integer> list = map.getOrDefault(strQuery,new ArrayList<>());
+                int startIndex = getMinOverScore(list,score);
 
-                if (!map.containsKey(key)) {
-                    answer[i] = 0;
-                    continue;
-                }
-
-                List<Integer> list = map.get(key);
-                int idx = lowerBound(list, score);
-                answer[i] = list.size() - idx;
+                answer[i] = list.size()-startIndex;
             }
 
             return answer;
         }
 
-        // DFS로 조합 생성
-        private void dfs(String[] arr, int depth, String key, int score) {
-            if (depth == 4) {
-                map.computeIfAbsent(key, k -> new ArrayList<>()).add(score);
-                return;
-            }
-            // 현재 조건 선택
-            dfs(arr, depth + 1, key + arr[depth], score);
-            // "-" 선택
-            dfs(arr, depth + 1, key + "-", score);
+        private void saveToMap(String[] curField, Map<String, List<Integer>> map) {
+            StringBuilder sb =new StringBuilder();
+            dfs(0,map,curField,new boolean[4]);
         }
 
-        // lower bound (score 이상인 첫 위치 찾기)
-        private int lowerBound(List<Integer> list, int target) {
-            int left = 0, right = list.size();
-            while (left < right) {
-                int mid = (left + right) / 2;
-                if (list.get(mid) >= target) right = mid;
-                else left = mid + 1;
+        private void dfs(int i, Map<String, List<Integer>> map, String[] curField, boolean[] visit) {
+            if(i==4) {
+                StringBuilder sb = new StringBuilder();
+                for(int b=0;b<4;b++){
+                    if(visit[b]){
+                        sb.append(curField[b]);
+                        continue;
+                    }
+
+                    sb.append("-");
+                }
+
+                map.putIfAbsent(sb.toString(),new ArrayList<>());
+                map.get(sb.toString()).add(Integer.valueOf(curField[4]));
+                return;
             }
-            return left;
+
+            visit[i] = true;
+            dfs(i+1,map,curField,visit);
+            visit[i] = false;
+            dfs(i+1,map,curField,visit);
+        }
+
+        private String getStrQuery(String query) {
+            String[] split = query.split(" and ");
+            StringBuilder sb = new StringBuilder();
+            for(int i=0;i<split.length;i++){
+                if(i==split.length-1){
+                    String str = split[i].split(" ")[0];
+                    sb.append(str);
+                    continue;
+                }
+                sb.append(split[i]);
+            }
+            return sb.toString();
+        }
+
+        private int getScore(String query) {
+            String[] split = query.split(" and ");
+            return Integer.parseInt(split[3].split(" ")[1]);
+        }
+
+        private int getMinOverScore(List<Integer> list, int score) {
+            int start = 0;
+            int end = list.size();
+
+            while (start<end){
+                int mid = (start+end)/2;
+
+                if(list.get(mid)>=score)
+                    end=mid;
+                else
+                    start=mid+1;
+            }
+
+            return start;
         }
     }
