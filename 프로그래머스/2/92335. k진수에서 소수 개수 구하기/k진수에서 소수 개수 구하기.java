@@ -1,46 +1,49 @@
 import java.util.*;
 
 class Solution {
-    public int solution(int n, int k) {
-        int answer = 0;
-        // 1. n을 k진수로 변환 후 charArray로 변환
-        char[] charArray = Integer.toString(n,k).toCharArray();
-        // 2. charArray 순환
-        StringBuilder sb = new StringBuilder();
-        for(int i=0;i<charArray.length;i++){
-            if(charArray[i] == '0'){
-                // 0이 나오면 소수판별 후 sb 초기화
-                if(sb.length()>=1 && isSosoo(Long.parseLong(sb.toString()))){
-                   answer++; 
-                }
-                sb.setLength(0);
+        public int solution(int n, int k) {
+            char[] charArray = Integer.toString(n, k).toCharArray();
+            List<String> formations = getFormations(charArray);
+
+            int answer = 0;
+            for(String formation : formations){
+                if(isPrime(Long.parseLong(formation)))
+                    answer++;
             }
-            else{
+
+            return answer;
+        }
+
+        private static List<String> getFormations(char[] charArray) {
+            List<String> formations = new ArrayList<>();
+            StringBuilder sb = new StringBuilder();
+            for(int i = 0; i< charArray.length; i++){
+                if(charArray[i]=='0'){
+                    if(sb.length()>0){
+                        formations.add(sb.toString());
+                        sb.setLength(0);
+                    }
+
+                    continue;
+                }
+
                 sb.append(charArray[i]);
-            }
-            // 0이 나올때까지 sb.append
-
-        }
-        if(sb.length()>0){
-            // 5. 만약 끝이나면 그대로 소수판별
-             if(isSosoo(Long.parseLong(sb.toString()))){
-                   answer++; 
+                if(i== charArray.length-1){
+                    formations.add(sb.toString());
                 }
+            }
+            return formations;
         }
-        return answer;
 
-    }
-    
-    private boolean isSosoo(Long target){
-        if(target<2) return false;
-        if(target==2) return true;
-        
-        if(target % 2 ==0) return false;
-        
-        for(int i=3;i<=Math.sqrt(target);i+=2){
-            if(target%i==0) return false;
+        private boolean isPrime(long n) {
+            if(n==1) return false;
+            if(n==2) return true;
+            if(n==3) return true;
+
+            for(int i=2;i<=Math.sqrt(n);i++){
+                if(n%i==0) return false;
+            }
+
+            return true;
         }
-        
-        return true;
     }
-}
