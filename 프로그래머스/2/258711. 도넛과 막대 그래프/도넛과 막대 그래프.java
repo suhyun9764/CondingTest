@@ -1,87 +1,59 @@
 import java.util.*;
 
 class Solution {
-        Map<Integer, List<Integer>> childMap = new HashMap<>();
-        Map<Integer, List<Integer>> parentMap = new HashMap<>();
+		Map<Integer, List<Integer>> map = new HashMap<>();
+		Map<Integer, Integer> lineNumber = new HashMap<>();
+		int[] answer = new int[4];
 
-        int[] answer = new int[4];
+		public int[] solution(int[][] edges) {
+			int root = 0;
+			for (int i = 0; i < edges.length; i++) {
+				map.putIfAbsent(edges[i][0], new ArrayList<>());
+				map.get(edges[i][0]).add(edges[i][1]);
+				if(map.get(edges[i][0]).size()>=2) root = edges[i][0];
+				lineNumber.put(edges[i][1], lineNumber.getOrDefault(edges[i][1], 0) + 1);
+			}
 
-        public int[] solution(int[][] edges) {
-            for(int[] edge : edges){
-                int parent = edge[0];
-                int child = edge[1];
+			answer[0] = root;
 
-                childMap.putIfAbsent(parent,new ArrayList<>());
-                childMap.get(parent).add(child);
+			Set<Integer> visited = new HashSet<>();
+			visited.add(root);
+			List<Integer> children = map.get(root);
+			for (int child : children) {
+				visited.add(child);
+				dfs(child, visited, 0, 0);
+			}
 
-                parentMap.putIfAbsent(child,new ArrayList<>());
-                parentMap.get(child).add(parent);
-            }
+			return answer;
+		}
 
-            int root = findRoot();
-            answer[0] = root;
-            List<Integer> children = childMap.get(root);
-            Set<Integer> visited = new HashSet<>();
-            visited.add(root);
-            for(int child : children){
-                if(visited.contains(child))continue;
-                visited.add(child);
-                int[] result = dfs(child,visited,new int[]{0,0});
-                processResult(result);
-            }
-            return answer;
-        }
+		private void dfs(int root, Set<Integer> visited, int edgeCnt, int lineCnt) {
+			edgeCnt++;
+			List<Integer> children = map.get(root);
+			if(children!=null) lineCnt+=children.size();
 
-        private void processResult(int[] result) {
-            int edgeCnt = result[0];
-            int lineCnt = result[1];
-            if(edgeCnt==lineCnt){
-                answer[1]++;
-                return;
-            }
+			boolean canMove = false;
+			List<Integer> child = map.get(root);
+			if (child!=null) {
+				if (!visited.contains(child.get(0))) {
+					canMove = true;
+					visited.add(child.get(0));
+					dfs(child.get(0), visited, edgeCnt, lineCnt);
+				}
+			}
 
-            if(edgeCnt-1==lineCnt){
-                answer[2]++;
-                return;
-            }
+			if (canMove == false) {
+				if (edgeCnt == lineCnt) {
+					answer[1]++;
+					return;
+				}
 
-            answer[3]++;
-        }
+				if (edgeCnt - 1 == lineCnt) {
+					answer[2]++;
+					return;
+				}
 
-        private int[] dfs(int curNode, Set<Integer> visited, int[] result) {
-           result[0]++;
-            List<Integer> children = null;
-            if(childMap.containsKey(curNode)){
-                result[1]+=childMap.get(curNode).size();
-                children = childMap.get(curNode);
-            }
-
-
-            boolean canMove = false;
-            if(children!=null){
-                for(int i=0;i<children.size();i++){
-                    int curChild = children.get(i);
-                    if(visited.contains(curChild)) continue;
-                    visited.add(curChild);
-                    canMove = true;
-                    dfs(curChild,visited,result);
-                }
-            }
-            
-
-            return result;
-        }
-
-        private int findRoot() {
-            int maxOut = 0;
-            int result = 0;
-            for (Integer parent : childMap.keySet()) {
-                if(!parentMap.containsKey(parent)){
-                    if(childMap.get(parent).size()>=2&&!parentMap.containsKey(parent))
-                        result = parent;
-                }
-            }
-            return result;
-        }
-
-    }
+				answer[3]++;
+			}
+		}
+	}
