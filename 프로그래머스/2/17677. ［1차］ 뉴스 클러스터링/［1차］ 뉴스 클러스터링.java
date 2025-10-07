@@ -1,54 +1,47 @@
 import java.util.*;
 
 class Solution {
-    public int solution(String str1, String str2) {
-        int answer = 0;
-        char[] charArr1 = str1.toCharArray();
-        char[] charArr2 = str2.toCharArray();
-        
-        double aNum = 0;
-        double bNum = 0;
-        double both = 0;
-        
-        Map<String,Integer> map1 = new HashMap<>();
-        Map<String,Integer> map2 = new HashMap<>();
-        for(int i=0;i<charArr1.length-1;i++){
-            StringBuilder sb = new StringBuilder();
-            if(Character.isAlphabetic(charArr1[i])&&Character.isAlphabetic(charArr1[i+1])){
-                sb.append(charArr1[i]);
-                sb.append(charArr1[i+1]);
-                String lowerCase = sb.toString().toLowerCase();
-                map1.put(lowerCase,map1.getOrDefault(lowerCase,0)+1);
-                aNum ++;
+        public int solution(String str1, String str2) {
+            str1 = str1.toLowerCase();
+            str2 = str2.toLowerCase();
+
+            Map<String,Integer> first = new HashMap<>();
+
+            int firstCnt = 0;
+            for(int i=0;i<str1.length()-1;i++){
+                char firstChar = str1.charAt(i);
+                char secondChar = str1.charAt(i + 1);
+
+                if(!Character.isLetter(firstChar)||!Character.isLetter(secondChar)) continue;
+                firstCnt++;
+                String value = str1.substring(i, i + 2);
+                first.put(value,first.getOrDefault(value,0)+1);
             }
-        
-        }
-        
-        for(int i=0;i<charArr2.length-1;i++){
-            StringBuilder sb = new StringBuilder();
-            if(Character.isAlphabetic(charArr2[i])&&Character.isAlphabetic(charArr2[i+1])){
-                sb.append(charArr2[i]);
-                sb.append(charArr2[i+1]);
-                String lowerCase = sb.toString().toLowerCase();
-                map2.put(lowerCase,map2.getOrDefault(lowerCase,0)+1);
-                bNum ++;
+
+            int secondCnt = 0;
+            int bothCnt = 0;
+            for(int i=0;i<str2.length()-1;i++){
+                char firstChar = str2.charAt(i);
+                char secondChar = str2.charAt(i + 1);
+
+                if(!Character.isLetter(firstChar)||!Character.isLetter(secondChar)) continue;
+                String value = str2.substring(i, i + 2);
+                secondCnt++;
+                if(first.containsKey(value)&&first.get(value)>0){
+                    bothCnt++;
+                    first.put(value,first.get(value)-1);
+                }
             }
-            
+            double rate;
+            if(firstCnt==0&&secondCnt==0)
+                rate = 1;
+            else{
+                rate = (double) bothCnt/(firstCnt+secondCnt-bothCnt);
+            }
+            rate*=65536;
+
+            return (int)rate;
+
+
         }
-        
-        for(String key : map1.keySet()){
-            System.out.println(key);
-            both += Math.min(map1.get(key),map2.getOrDefault(key,0));
-        }
-         
-        double rate = 0;
-        
-        if(aNum==0&&bNum==0){
-            rate = 1;
-        }else{
-            rate =  both/(aNum+bNum-both);
-        }
-        
-        return (int)(Math.floor(rate*65536));
     }
-}
