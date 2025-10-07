@@ -1,31 +1,43 @@
 import java.util.*;
+ class Solution {
+        Map<String,Integer> cache;
+        public int solution(int cacheSize, String[] cities) {
+            cache = new HashMap<>();
 
-class Solution {
-    public int solution(int cacheSize, String[] cities) {
-        // 메인 아이디어 : order(사용된 순서)이 낮을수록 큐의 맨앞에 위치 
-        // Map을 사용하여 현재 캐시상태 관리
-        // queue에서 Pop될때 map에서도 삭제
-        int answer = 0;
-        LinkedList<String> cache = new LinkedList<>();
-        for(int i=0;i<cities.length;i++){
-            String currentCity = cities[i].toLowerCase();
-            if(cache.remove(currentCity)){
-                cache.addLast(currentCity);
-                answer++;
-                continue;
+            int total = 0;
+            for(int i=0;i<cities.length;i++){
+                String cur = cities[i].toLowerCase();
+                if(cacheHit(cur)){
+                    total+=1;
+                    cache.put(cur,i);
+                    continue;
+                }
+                if(cacheSize!=0&&cache.size()==cacheSize){
+                    removeOldCache();
+                }
+                if(cacheSize!=0&&cache.size()<cacheSize)
+                    cache.put(cur,i);
+                total+=5;
             }
-            
-            if(cacheSize!=0&&cache.size()==cacheSize){
-                cache.removeFirst();
-            }
-            
-            if(cacheSize!=0){
-                cache.addLast(currentCity);
-            }
-            
-            answer+=5;
+            return total;
         }
-        
-        return answer;
+
+        private boolean cacheHit(String cur) {
+            return cache.containsKey(cur);
+        }
+
+        private void removeOldCache() {
+            int min = Integer.MAX_VALUE;
+            String target = null;
+            for (Map.Entry<String, Integer> entry : cache.entrySet()) {
+                String value = entry.getKey();
+                int order = entry.getValue();
+                if(min>order){
+                    min = order;
+                    target = value;
+                }
+            }
+
+            cache.remove(target);
+        }
     }
-}
