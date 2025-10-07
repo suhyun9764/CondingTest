@@ -1,10 +1,10 @@
 # [level 2] 오픈채팅방 - 42888 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/42888) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/42888?utm_source=chatgpt.com) 
 
 ### 성능 요약
 
-메모리: 180 MB, 시간: 140.65 ms
+메모리: 171 MB, 시간: 135.20 ms
 
 ### 구분
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2025년 09월 13일 21:03:47
+2025년 10월 07일 23:33:57
 
 ### 문제 설명
 
