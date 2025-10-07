@@ -1,10 +1,10 @@
 # [level 1] 실패율 - 42889 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/42889) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/42889?utm_source=chatgpt.com) 
 
 ### 성능 요약
 
-메모리: 100 MB, 시간: 4.84 ms
+메모리: 85.7 MB, 시간: 70.87 ms
 
 ### 구분
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2025년 09월 13일 20:38:10
+2025년 10월 08일 00:03:35
 
 ### 문제 설명
 
