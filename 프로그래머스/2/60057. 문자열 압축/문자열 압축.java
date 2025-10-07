@@ -1,51 +1,51 @@
 class Solution {
-        public int solution(String s) {
-            int min = s.length();
-            for(int n=1;n<=s.length()/2;n++){
-                // n자리수 만큼 끊어서 연속되는게 있다면 압축하여 만들기
-                min = Math.min(min,strZip(s,n));
-            }
 
-            return min;
+        int answer = Integer.MAX_VALUE;
+        public int solution(String s) {
+            // 배열로 만들기
+            // 2개단위~s의길이/2만큼 순회하며 가장 짧은 문자열 구하기
+            if(s.length()==1)
+                return 1;
+            for(int i=1;i<=s.length()/2;i++){
+                String compressResult = compress(s, i);
+                answer = Math.min(answer,compressResult.length());
+            }
+            return answer;
         }
 
-        private int strZip(String s, int n) {
-            char[] charArray = s.toCharArray();
+        private String compress(String s, int size) {
+            int left = size;
+            int right = left+size;
 
-
-            String before = s.substring(0,n);
+            String before = s.substring(0,size);
             StringBuilder sb = new StringBuilder();
-            int cont = 1;
-            int nextI = 1;
-            for(int i=n;i+n-1<charArray.length;i+=n){
-                nextI = i+n;
-                String cur = s.substring(i,i+n);
+            int repeatCnt = 1;
+            while (right<=s.length()){
+                String cur = s.substring(left,right);
+                left += size;
+                right+=size;
                 if(before.equals(cur)){
-                    cont++;
+                    repeatCnt++;
                     continue;
                 }
-
-                if(cont==1)
-                    sb.append(before);
-                else{
-                    sb.append(cont).append(before);
-                }
-
-                cont = 1;
-                before = cur;
-            }
-
-            if(cont==1)
+                if(repeatCnt!=1)
+                    sb.append(repeatCnt);
                 sb.append(before);
-            else{
-                sb.append(cont).append(before);
+                before = cur;
+                repeatCnt=1;
             }
 
-            if(nextI<s.length())
-                sb.append(s.substring(nextI));
+            if(left>=s.length()){
+                if(repeatCnt!=1)
+                    sb.append(repeatCnt);
+                sb.append(before);
+                return sb.toString();
+            }
 
-
-
-            return sb.length();
+            if(repeatCnt!=1)
+                sb.append(repeatCnt);
+            sb.append(before);
+            sb.append(s.substring(left));
+            return sb.toString();
         }
     }

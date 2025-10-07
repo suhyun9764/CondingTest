@@ -1,10 +1,10 @@
 # [level 2] 문자열 압축 - 60057 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/60057) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/60057?language=java&utm_source=chatgpt.com) 
 
 ### 성능 요약
 
-메모리: 91.7 MB, 시간: 7.14 ms
+메모리: 86.4 MB, 시간: 6.94 ms
 
 ### 구분
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2025년 09월 19일 17:06:12
+2025년 10월 07일 22:11:44
 
 ### 문제 설명
 
