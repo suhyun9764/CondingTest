@@ -1,85 +1,78 @@
 import java.util.*;
+
 class Solution {
+        StringBuilder sb = new StringBuilder();
         public String solution(String p) {
-            // 1. p를 charArr로
-            // 2. charArr 순회
-            // 3. '('랑 ')'가 같아질때까지 index올리기
-            // 4. 추출된 문자열 올바른 괄호 문자열인지 확인
-            // 5. 올바른 괄호 문자열이 맞다면 그대로 두고 v에 대해 1번부터 다시 수행
-            // 6. 올바른 괄호 문자열이 아니라면 1단계부터 다시 수행한 v를 (뒤에 붙혀넣고 )붙히고 앞뒤를 짜른 u를 () 바꿔서 붙히기
+            // index가 p길이보다 작을때까지만 순회
+            // (와 )의 값이 같아 질때까지 index ++
+            // 해당값까지가 u, 나머지는 v
+            // 만약 u가 올바른 괄호문자열이라면 그대로 두고 v1번부터 다시
+            // 만약 u가 올바른 문자열 아니라면 아래 규칙따르기
+            /*
+            4-1. 빈 문자열에 첫 번째 문자로 '('를 붙입니다.
+            4-2. 문자열 v에 대해 1단계부터 재귀적으로 수행한 결과 문자열을 이어 붙입니다.
+            4-3. ')'를 다시 붙입니다.
+            4-4. u의 첫 번째와 마지막 문자를 제거하고, 나머지 문자열의 괄호 방향을 뒤집어서 뒤에 붙입니다.
+             4-5. 생성된 문자열을 반환합니다.
+             */
 
-            String answer = getValidString(p);
-            return answer;
+            return dfs(p);
         }
 
-        private String getValidString(String p) {
-            char[] charArray = p.toCharArray();
-            if(isValid(charArray)) return p;
-
-            int open = 0;
-            int close = 0;
-
-            String u = "";
-            String v = "";
-
-            for(int i=0;i<charArray.length;i++){
-                char cur = charArray[i];
-                if(cur=='(') open++;
-                if(cur==')') close++;
-
-                if(close==open){
-                    u = p.substring(0,i+1);
-                    if(i+1<p.length())
-                        v = p.substring(i+1);
-                    break;
-                }
-            }
-
-
-            v = getValidString(v);
-            if(isValid(u.toCharArray())){
-                return u+v;
-            }
-
-            u = reverse(u);
-            return "("+v+")"+u;
-        }
-
-        private String reverse(String u) {
-            if(u.length()<=2)
+        private String dfs(String p) {
+            if(p.length()==0)
                 return "";
 
-            u = u.substring(1, u.length() - 1);
-            char[] charArray = u.toCharArray();
-            StringBuilder sb = new StringBuilder();
-            for(int i=0;i<charArray.length;i++){
-                char cur = charArray[i];
-                if(cur=='(')
-                    sb.append(')');
+            String[] uAndV = findUandV(p);
+            String u = uAndV[0];
+            String v = uAndV[1];
 
-                else
-                    sb.append('(');
+
+
+            if(isPerfect(u)){
+                return u+dfs(v);
             }
 
+            StringBuilder sb = new StringBuilder();
+            sb.append("(");
+            sb.append(dfs(v));
+            sb.append(")");
+            for(int i=1;i<u.length()-1;i++){
+                if(u.charAt(i)=='(') sb.append(')');
+                if(u.charAt(i)==')') sb.append('(');
+            }
             return sb.toString();
         }
 
-        private boolean isValid(char[] charArray) {
-            Stack<Character> stack = new Stack();
-            for(int i=0;i<charArray.length;i++){
-                char cur = charArray[i];
-                if(cur=='('){
-                    stack.push(cur);
-                    continue;
-                }
-
-                if(stack.isEmpty()) return false;
-
-                if(stack.peek()=='('){
+        private boolean isPerfect(String u) {
+            Stack<Character> stack = new Stack<>();
+            for(int i=0;i<u.length();i++){
+                char cur = u.charAt(i);
+                if(cur=='(') stack.push('(');
+                if(cur==')'){
+                    if(stack.isEmpty()) return false;
                     stack.pop();
                 }
             }
+            if(stack.isEmpty()) return true;
+            return false;
+        }
 
-            return true;
+        private String[] findUandV(String p) {
+            int openCnt = 0;
+            int closeCnt = 0;
+            String[] result = new String[2];
+            for(int i=0;i<p.length();i++){
+                if(p.charAt(i)=='(') openCnt++;
+                if(p.charAt(i)==')') closeCnt++;
+
+                if(closeCnt!=openCnt) continue;
+
+                result[0] = p.substring(0,i+1);
+                result[1] = p.substring(i+1);
+                break;
+            }
+
+            return result;
         }
     }
