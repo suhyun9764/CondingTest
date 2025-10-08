@@ -2,108 +2,127 @@ import java.util.*;
 
 class Solution {
         public int[] solution(String[] words, String[] queries) {
-            // 원래단어 -> 크기에 따라, 크기가 같으면 compareto에 따라 나열
-            // 거꾸로뒤집어서 -> 크기에 따라, 크기가 같으면 compareto에 따라
-            Map<Integer, List<String>> map = new HashMap<>();
-            Map<Integer,List<String>> reverseMap = new HashMap<>();
+            // map길이별 -> 모든 조합에 따른 map
+//            Map<Integer,Map<String,Integer>> lengthMap = new HashMap<>();
+//
+//            for(String word : words){
+//                int length = word.length();
+//                lengthMap.putIfAbsent(length,new HashMap<>());
+//                Map<String, Integer> comb = lengthMap.get(length);
+//                saveAllComb(word,0,length,new StringBuilder(),comb);
+//            }
+//
+//            int[] answer = new int[queries.length];
+//            for(int i=0;i<queries.length;i++){
+//                String query = queries[i];
+//                int queryLength = query.length();
+//
+//                if(!lengthMap.containsKey(queryLength)) continue;
+//                Map<String, Integer> comb = lengthMap.get(queryLength);
+//                if(!comb.containsKey(query)) continue;
+//                answer[i] = comb.get(query);
+//            }
+//
+//            return answer;
+            Map<Integer,List<String>> wordMap = new HashMap<>();
+            Map<Integer,List<String>> reverseWordMap = new HashMap<>();
 
-            String[] reverse = Arrays.copyOf(words, words.length);
-            for(int i=0;i< reverse.length;i++){
-                StringBuilder sb = new StringBuilder(reverse[i]);
-                reverse[i] = sb.reverse().toString();
+            for(String word : words){
+                int length = word.length();
+                wordMap.putIfAbsent(length,new ArrayList<>());
+                reverseWordMap.putIfAbsent(length,new ArrayList<>());
+                wordMap.get(length).add(word);
+                String reverseWord = reverse(word);
+                reverseWordMap.get(length).add(reverseWord);
             }
 
-            for(int i=0;i<words.length;i++){
-                String word = words[i];
-                String reverseWord = reverse[i];
-
-                map.putIfAbsent(word.length(),new ArrayList<>());
-                map.get(word.length()).add(word);
-
-                reverseMap.putIfAbsent(reverseWord.length(),new ArrayList<>());
-                reverseMap.get(reverseWord.length()).add(reverseWord);
-            }
-
-            // ✅ 길이별 정렬 보장
-            for (List<String> lst : map.values()) Collections.sort(lst);
-            for (List<String> lst : reverseMap.values()) Collections.sort(lst);
-
+            wordMap.values().stream().forEach(Collections::sort);
+            reverseWordMap.values().stream().forEach(Collections::sort);
             int[] answer = new int[queries.length];
             for(int i=0;i<queries.length;i++){
-                String cur = queries[i];
-                boolean isReverse = false;
-
-                if(cur.startsWith("?")) isReverse = true;
-
-                String target = cur.replace("?", "");
-                if(isReverse){
-                    StringBuilder sb = new StringBuilder(target);
-                    target = sb.reverse().toString();
+                String query = queries[i];
+                int length = query.length();
+                Map<Integer,List<String>> map = wordMap;
+                if(query.startsWith("?")){
+                    query = reverse(query);
+                    map = reverseWordMap;
                 }
-                int targetLength = cur.length();
-
-                // 길이가 같아지는 시작점 구하기
-                List<String> compareWords = map.get(targetLength);
-                if(isReverse)
-                    compareWords = reverseMap.get(targetLength);
-
-
-//                int start = getSameLengthStart(targetLength,compareWords);
-                // target으로 시작하는 시작점 구하기
-                if(compareWords==null){
+                query = getUnit(query);
+                List<String> candidates = map.get(length);
+                if(candidates==null){
                     answer[i] = 0;
                     continue;
                 }
-                int sameStart = getSameStart(target,compareWords);
-                int sameEnd = getSameEnd(target,compareWords);
-//                int cnt = 0;
-//                for(int t= sameStart;t<sameEnd;t++){
-//                    String curWord = compareWords.get(t);
-//                    int curWordLength = curWord.length();
-//                    if(!curWord.startsWith(target)) break;
-//                    if(curWordLength !=targetLength) continue;
-//                    cnt++;
-//                }
+                if(query.length()==0){
+                    answer[i] = candidates.size();
+                    continue;
+                }
+                int start = findStart(query,candidates);
+                        if(start>=candidates.size()) continue;
+                if(!candidates.get(start).startsWith(query)) continue;
+                int end = findEnd(query,candidates);
+                answer[i] = end-start;
 
-                answer[i] = sameEnd-sameStart;
             }
             return answer;
         }
 
+        private int findStart(String query, List<String> candidates) {
+            int l = 0;
+            int r = candidates.size();
 
-        private int getSameEnd(String target, List<String> words) {
-            int start = 0;
-            int end = words.size();
-            target = target+"{";
-
-            while (start<end){
-                int mid = (start+end)/2;
-
-                if(words.get(mid).compareTo(target)>=0){
-                    end = mid;
-                }else{
-                    start = mid+1;
-                }
+            while (l<r){
+                int mid = (l + r) / 2;
+                if (candidates.get(mid).compareTo(query) >= 0)
+                    r = mid;
+                else
+                    l = mid + 1;
             }
 
-            return start;
+            return l;
+
         }
 
-
-
-        private int getSameStart(String target, List<String> words) {
-            int start = 0;
-            int end = words.size();
-
-            while (start<end){
-                int mid = (start+end)/2;
-
-                if(words.get(mid).compareTo(target)>=0){
-                    end = mid;
-                }else{
-                    start =mid+1;
-                }
+        private int findEnd(String query, List<String> candidates) {
+            int l = 0;
+            int r = candidates.size();
+            char newC = (char) (query.charAt(query.length()-1)+1); StringBuilder sb = new StringBuilder(query); sb.setLength(query.length()-1); sb.append(newC); query = sb.toString();
+            while (l<r){
+                int mid = (l + r) / 2;
+                if (candidates.get(mid).compareTo(query) > 0)
+                    r = mid;
+                else
+                    l = mid + 1;
             }
-            return start;
+
+            return l;
         }
+
+        private String getUnit(String query) {
+            int idx = query.indexOf('?');
+            if (idx == -1) return query;
+            return query.substring(0, idx);
+        }
+
+        private String reverse(String word) {
+            StringBuilder sb = new StringBuilder();
+            for(int i=word.length()-1;i>=0;i--) {
+                sb.append(word.charAt(i));
+            }
+
+            return sb.toString();
+        }
+
+//        private void saveAllComb(String word, int depth, int N, StringBuilder sb, Map<String, Integer> comb) {
+//            if(depth==N){
+//                comb.put(sb.toString(),comb.getOrDefault(sb.toString(),0)+1);
+//                return;
+//            }
+//
+//            sb.append(word.charAt(depth));
+//            saveAllComb(word,depth+1,N,sb,comb);
+//            sb.setLength(depth);
+//            sb.append("?");
+//            saveAllComb(word,depth+1,N,sb,comb);
+//        }
     }
