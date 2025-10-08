@@ -1,10 +1,10 @@
 # [level 4] 가사 검색 - 60060 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/60060) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/60060?utm_source=chatgpt.com) 
 
 ### 성능 요약
 
-메모리: 93 MB, 시간: 315.40 ms
+메모리: 501 MB, 시간: 655.89 ms
 
 ### 구분
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2025년 10월 08일 16:38:44
+2025년 10월 09일 04:29:12
 
 ### 문제 설명
 
