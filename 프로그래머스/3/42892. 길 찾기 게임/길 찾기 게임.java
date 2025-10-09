@@ -1,105 +1,98 @@
 import java.util.*;
 
 class Solution {
-        class Node implements Comparable<Node>{
-            int order;
-            int x;
-            int y;
-
-            Node left = null;
-            Node right = null;
-
-            public Node(int order, int x, int y) {
-                this.order = order;
-                this.x = x;
-                this.y = y;
-            }
-
-            public int compareTo(Node o) {
-                if(this.y==o.y)
-                    return this.x-o.x;
-
-                return o.y-this.y;
+    public int[][] solution(int[][] nodeinfo) {
+        // 층별로 분류
+        Map<Integer,List<Node>> map = new HashMap<>();
+        int max = 0;
+        for(int i=0;i<nodeinfo.length;i++){
+            int[] curNode = nodeinfo[i];
+            int x = curNode[0];
+            int y= curNode[1];
+            
+            map.putIfAbsent(y,new ArrayList<>());
+            map.get(y).add(new Node(x,i+1));
+            max = Math.max(max,y);
+        }
+        
+        Node root = map.get(max).get(0);
+        for(int i=max-1;i>=0;i--){
+            List<Node> nodes = map.get(i);
+            if(nodes==null) continue;
+            for(Node node : nodes){
+                root.insert(node);
             }
         }
-        public int[][] solution(int[][] nodeinfo) {
-            PriorityQueue<Node> pq = new PriorityQueue<>();
-            int n = nodeinfo.length;
-
-            for(int i=1;i<=n;i++){
-                pq.add(new Node(i,nodeinfo[i-1][0],nodeinfo[i-1][1]));
-            }
-
-             Node root = pq.poll();
-            while (!pq.isEmpty()){
-                insert(root,pq.poll());
-            }
-
-            int[] pre = preorder(root);
-            int[] post = postorder(root);
-
-            return new int[][]{pre,post};
-
+        int[][] answer = new int[2][nodeinfo.length];
+        answer[0] = pre(root);
+        answer[1] = post(root);
+        return answer;
+    }
+    
+    private int[] pre(Node node){
+        List<Integer> list = new ArrayList<>();
+        preDfs(node,list);
+        int[] answer = new int[list.size()];
+        for(int i=0;i<list.size();i++){
+            answer[i] = list.get(i);
         }
-
-        private int[] preorder(Node root) {
-            List<Integer> list = preDfs(root, new ArrayList<>());
-            int[] arr = new int[list.size()];
-            for(int i=0;i<arr.length;i++){
-                arr[i] = list.get(i);
-            }
-            return arr;
+        return answer;
+    }
+    
+    private void preDfs(Node node,List<Integer> list){
+        list.add(node.order);
+        if(node.left!=null){
+            preDfs(node.left,list);
         }
-
-        private List<Integer> preDfs(Node node, List<Integer> list) {
-            list.add(node.order);
-            if(node.left!=null){
-                list = preDfs(node.left,list);
-            }
-
-            if(node.right!=null){
-                list = preDfs(node.right,list);
-            }
-
-            return list;
-        }
-
-        private int[] postorder(Node root) {
-            List<Integer> list = postDfs(root, new ArrayList<>());
-            int[] arr = new int[list.size()];
-            for(int i=0;i<arr.length;i++){
-                arr[i] = list.get(i);
-            }
-            return arr;
-        }
-
-        private List<Integer> postDfs(Node node, List<Integer> list) {
-            if(node.left!=null){
-                postDfs(node.left,list);
-            }
-
-            if(node.right!=null){
-                postDfs(node.right,list);
-            }
-
-            list.add(node.order);
-
-            return list;
-        }
-
-        private void insert(Node parent, Node cur) {
-            if(cur.x<parent.x){
-                if(parent.left==null){
-                    parent.left = cur;
-                }else{
-                    insert(parent.left,cur);
-                }
-            }else{
-                if(parent.right==null){
-                    parent.right = cur;
-                }else{
-                    insert(parent.right,cur);
-                }
-            }
+        
+        if(node.right!=null){
+            preDfs(node.right,list);
         }
     }
+    
+    private int[] post(Node node){
+        List<Integer> list = new ArrayList<>();
+        postDfs(node,list);
+        int[] answer = new int[list.size()];
+        for(int i=0;i<list.size();i++){
+            answer[i] = list.get(i);
+        }
+        return answer;
+    }
+    
+        private void postDfs(Node node,List<Integer> list){
+        if(node.left!=null){
+            postDfs(node.left,list);
+        }
+        
+        if(node.right!=null){
+            postDfs(node.right,list);
+        }
+        list.add(node.order);
+    }
+}
+
+class Node{
+    int value;
+    int order;
+    Node left;
+    Node right;
+    
+    public void insert(Node o){
+        if(value>o.value){ 
+            if(left==null) left = o;
+            else
+                left.insert(o);
+        }else{
+            if(right==null) right = o;
+            else
+                right.insert(o);
+        }
+    }
+    
+    public Node(int value,int order){
+        this.value = value;
+        this.order = order;
+    }
+    
+}

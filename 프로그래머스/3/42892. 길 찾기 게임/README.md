@@ -1,10 +1,10 @@
 # [level 3] 길 찾기 게임 - 42892 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/42892) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/42892?utm_source=chatgpt.com) 
 
 ### 성능 요약
 
-메모리: 110 MB, 시간: 41.27 ms
+메모리: 104 MB, 시간: 57.70 ms
 
 ### 구분
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2025년 09월 15일 22:46:37
+2025년 10월 09일 18:25:19
 
 ### 문제 설명
 
