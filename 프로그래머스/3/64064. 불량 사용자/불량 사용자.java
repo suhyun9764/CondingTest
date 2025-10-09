@@ -1,63 +1,60 @@
 import java.util.*;
+
 class Solution {
-        static Set<String> answer = new HashSet<>();
-        public int solution(String[] user_id, String[] banned_id) {
-            List[] candidates = new ArrayList[banned_id.length];
-            for(int i=0;i<candidates.length;i++){
-                candidates[i] = new ArrayList<Integer>();
-            }
-            // 1. 각 제제 아이디에 해당하는 아이디들 분류
-            for(int i=0;i<banned_id.length;i++){
-                String currentBannedId = banned_id[i];
-                candidates[i] = findAvailableId(user_id,currentBannedId);
-            }
-
-            // 2. 오름차순 기준으로 선택
-            boolean[] selected = new boolean[user_id.length];
-            dfs(0,candidates,selected);
-            return answer.size();
+    String[] banned_id;
+    Set<String> answer = new HashSet<>();
+    int bannedNum;
+    Map<Integer,List<String>> map;
+    public int solution(String[] user_id, String[] banned_id) {
+        this.banned_id = banned_id;
+        bannedNum = banned_id.length;
+        System.out.println(bannedNum);
+        // user_id 길이별로 map에 저장
+        map = new HashMap<>();
+        for(String id : user_id){
+            int length = id.length();
+            map.putIfAbsent(length,new ArrayList<>());
+            map.get(length).add(id);
         }
-
-        private void dfs(int index, List[] candidates, boolean[] selected) {
-            if(index==candidates.length) {
-                StringBuilder sb = new StringBuilder();
-                for(int i=0;i<selected.length;i++){
-                    if(selected[i])
-                        sb.append(i);
-                }
-                answer.add(sb.toString());
-                return;
-            }
-
-
-            List<Integer> currentCandidates = candidates[index];
-
-            for (int i=0;i<currentCandidates.size();i++) {
-                int currentCandidate = currentCandidates.get(i);
-                if(selected[currentCandidate]) continue;
-                selected[currentCandidate] = true;
-                dfs(index+1,candidates,selected);
-                selected[currentCandidate] = false;
-            }
-        }
-
-        private List findAvailableId(String[] userIds, String currentBannedId) {
-            List<Integer> userList = new ArrayList<>();
-            for (int i = 0;i<userIds.length;i++) {
-                String userId = userIds[i];
-                if(userId.length()!=currentBannedId.length()) continue;
-                boolean isMatch = true;
-                for(int j=0;j<userId.length();j++){
-                    if(currentBannedId.charAt(j)=='*') continue;
-                    if(currentBannedId.charAt(j)!=userId.charAt(j)){
-                        isMatch = false;
-                        break;
-                    }
-                }
-                if(isMatch)
-                    userList.add(i);
-            }
-
-            return userList;
-        }
+        
+        dfs(0,new HashSet<>());
+        return answer.size();
     }
+    
+    private void dfs(int depth, Set<String> set){
+        if(depth==bannedNum){
+            List<String> idList = new ArrayList<>(set);
+            Collections.sort(idList);
+            StringBuilder sb = new StringBuilder();
+            for(String curId : idList){
+                sb.append(curId);
+            }
+            
+            answer.add(sb.toString());
+            return;
+        }
+        boolean exist = false;
+        
+        String curBanned = banned_id[depth];
+        int bannedLength = curBanned.length();
+        
+        List<String> list = map.get(bannedLength);
+        for(String id : list){
+            if(set.contains(id)) continue;
+            if(!isMatch(id,curBanned)) continue;
+            set.add(id);
+            dfs(depth+1,set);
+            set.remove(id);
+        }
+        
+    }
+    
+    private boolean isMatch(String id, String banned){
+        for(int i=0;i<id.length();i++){
+            if(banned.charAt(i)=='*') continue;
+            if(banned.charAt(i)!=id.charAt(i)) return false;
+        }
+        
+        return true;
+    }
+}
