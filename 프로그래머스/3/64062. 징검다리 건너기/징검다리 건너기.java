@@ -1,40 +1,40 @@
 import java.util.*;
 
 class Solution {
+    int k;
     public int solution(int[] stones, int k) {
-        int n = stones.length;
-        
-        int[] copy = Arrays.copyOf(stones,n);
-        Arrays.sort(copy);
+        this.k = k;
         int left = 0;
-        int right = copy[n-1];
-        int answer = 0;
-        while(left<=right){
+        int right = 200000000;
+        for(int i=0;i<stones.length;i++){
+            right = Math.max(stones[i],right);
+        }
+        while(left<right){
             int mid = (left+right)/2;
-            if(isAvailable(stones,mid,k)){
+            if(isAvailable(mid,stones)){
                 left = mid+1;
-                answer = mid;
             }else{
-                right = mid-1;
+                right = mid;
             }
         }
         
-        return answer;
+        return left-1;
     }
     
-    private boolean isAvailable(int[] stones, int mid, int k){
-        int zeroCnt = 0;
-        for(int stone : stones){
-            if(stone-mid<0){
-                zeroCnt++;
-                
-                if(zeroCnt>=k){
+    private boolean isAvailable(int mid,int[] stones){
+        int cnt = 0;
+        for(int i=0;i<stones.length;i++){
+            int stone = stones[i];
+            if(stone-mid+1<=0){
+                cnt++;
+                if(cnt>=k)
                     return false;
-                }
-            }else{
-                zeroCnt = 0;
             }
+ 
+            if(stone-mid+1>0) cnt=0;
         }
+        
+        if(cnt>=k) return false;
         
         return true;
     }
