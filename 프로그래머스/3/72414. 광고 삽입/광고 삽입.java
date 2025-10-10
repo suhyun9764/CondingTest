@@ -1,61 +1,61 @@
 import java.util.*;
 
 class Solution {
-        public String solution(String play_time, String adv_time, String[] logs) {
-            int playTime = convertToSecond(play_time);
-            int advTime = convertToSecond(adv_time);
-
-            long[] timeLine = new long[playTime+1];
-
-            for(int i=0;i<logs.length;i++){
-                String curLog = logs[i];
-                int start = getStartTime(curLog);
-                int end = getEndTime(curLog);
-
-                timeLine[start]+=1;
-                timeLine[end]-=1;
+    public String solution(String play_time, String adv_time, String[] logs) {
+        int playTime = toSecond(play_time);
+        int advTime = toSecond(adv_time);
+        long[] timeLine = new long[playTime+2];
+        for(String log : logs){
+            String[] fields = log.split("-");
+            int start = toSecond(fields[0]);
+            // System.out.println("Start :"+fields[0]+"="+start);
+            int end = toSecond(fields[1]);
+             // System.out.println("End :"+fields[1]+"="+end);
+            timeLine[start+1]++;
+            timeLine[end+1]--;
+        }
+        
+        for(int i=1;i<timeLine.length;i++){
+            timeLine[i] += timeLine[i-1];
+        }
+        
+        
+        for(int i=1;i<timeLine.length;i++){
+            timeLine[i] += timeLine[i-1];
+        }
+        
+        
+        long max = 0;
+        int start = 0;
+        for(int i=0;i<playTime;i++){
+            int end = i+advTime;
+            if(end>playTime) break;
+            long totalWatchingTime = timeLine[end]-timeLine[i];
+            if(max<totalWatchingTime){
+                max=totalWatchingTime;
+                // System.out.println(i+" : "+toPrint(totalWatchingTime));
+                start = i;
             }
-
-            for(int i=1;i<=playTime;i++){
-                timeLine[i] += timeLine[i-1];
-            }
-
-            for(int i=1;i<=playTime;i++){
-                timeLine[i] += timeLine[i-1];
-            }
-
-            long max =timeLine[advTime-1];
-            int startTime = 0;
-            for(int i=advTime;i<=playTime;i++){
-                long total = timeLine[i]-timeLine[i-advTime];
-                if(total>max) {
-                    max = total;
-                    startTime = i-advTime+1;
-                }
-            }
-
-            return toStringTime(startTime);
         }
-
-        private String toStringTime(int startTime) {
-            int hour = startTime/3600;
-            int minute = (startTime%3600)/60;
-            int second = startTime%60;
-
-            return String.format("%02d:%02d:%02d",hour,minute,second);
-        }
-
-
-        private int convertToSecond(String time) {
-            String[] fields = time.split(":");
-            return Integer.parseInt(fields[0])*60*60+Integer.parseInt(fields[1])*60+Integer.parseInt(fields[2]);
-        }
-
-        private int getStartTime(String curLog) {
-            return convertToSecond(curLog.split("-")[0]);
-        }
-
-        private int getEndTime(String curLog) {
-            return convertToSecond(curLog.split("-")[1]);
-        }
+        
+        return toPrint(start);
+        
     }
+    
+    private int toSecond(String time){
+        String[] fields = time.split(":");
+        int hour = Integer.parseInt(fields[0]);
+        int minute = Integer.parseInt(fields[1]);
+        int second = Integer.parseInt(fields[2]);
+        
+        return hour*3600+minute*60+second;
+    }
+    
+    private String toPrint(int second){
+        int hour = second/3600;
+        int minute = (second-(hour*3600))/60;
+        int sec = (second-(hour*3600)-(minute*60))%60;
+        
+        return String.format("%02d:%02d:%02d",hour,minute,sec).toString();
+    }
+}
