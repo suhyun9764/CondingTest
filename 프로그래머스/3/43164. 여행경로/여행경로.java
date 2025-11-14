@@ -1,42 +1,75 @@
 import java.util.*;
 
 class Solution {
-    List<String> route = new ArrayList<>();
-    boolean[] visited;
+    String[][] tickets;
+    int n;
+    boolean[] visit;
     String[] answer;
-    boolean found = false;
-
+    boolean find = false;
     public String[] solution(String[][] tickets) {
-        Arrays.sort(tickets, (a, b) -> {
-            if (a[0].equals(b[0])) {
-                return a[1].compareTo(b[1]);
-            }
+        this.tickets = tickets;
+        this.n = tickets.length;
+        this.visit = new boolean[n];
+        this.answer = new String[n+1];
+        answer[0] = "ICN";
+        Arrays.sort(tickets,(a,b)->{
+           if(a[0].equals(b[0]))
+               return a[1].compareTo(b[1]);
+            
             return a[0].compareTo(b[0]);
         });
 
-        visited = new boolean[tickets.length];
-        route.add("ICN");
-        dfs("ICN", tickets, 0);
+        
+        dfs("ICN",1);
         return answer;
     }
-
-    private void dfs(String current, String[][] tickets, int depth) {
-        if (found) return;
-
-        if (depth == tickets.length) {
-            answer = route.toArray(new String[0]);
-            found = true;
+    
+    private void dfs(String d, int depth){
+        if(depth==n+1){
+            find = true;
             return;
         }
-
-        for (int i = 0; i < tickets.length; i++) {
-            if (!visited[i] && tickets[i][0].equals(current)) {
-                visited[i] = true;
-                route.add(tickets[i][1]);
-                dfs(tickets[i][1], tickets, depth + 1);
-                visited[i] = false;
-                route.remove(route.size() - 1);
-            }
+        
+        int start = getStart(d);
+        
+        int end = getEnd(d);
+        // System.out.println("start : "+start+", end : "+end);
+        for(int i=start;i<end;i++){
+            if(visit[i]) continue;
+            visit[i] = true;
+            answer[depth] = tickets[i][1];
+            dfs(tickets[i][1],depth+1);
+            visit[i] = false;
+            if(find) break;
         }
     }
+    
+    private int getStart(String departure){
+        int l = 0;
+        int r = n;
+        
+        while(l<=r){
+            int mid = (l+r)/2;
+            
+            if(tickets[mid][0].compareTo(departure)>=0) r = mid-1;
+            else l = mid+1;
+        }
+        
+        return l;
+    }
+    
+    private int getEnd(String departure){
+        int l = 0;
+        int r = n;
+        
+        while(l<r){
+            int mid = (l+r)/2;
+            
+            if(tickets[mid][0].compareTo(departure)>0) r = mid;
+            else l = mid+1;
+        }
+        
+        return l;
+    }
+    
 }
