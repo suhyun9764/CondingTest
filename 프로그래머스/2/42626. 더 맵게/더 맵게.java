@@ -2,35 +2,22 @@ import java.util.*;
 
 class Solution {
     public int solution(int[] scoville, int K) {
-        // 1. PriorityQueue에 scoville 저장
-        // 2. peek한게 k보다 작거나 queue사이즈가 1보다 클때까지 순회
-        Queue<Long> queue = new PriorityQueue<Long>();
+        Queue<Integer> pq = new PriorityQueue<>();
         for(int i=0;i<scoville.length;i++){
-            queue.add((long)scoville[i]);
+            pq.add(scoville[i]);
         }
         
         int answer = 0;
-        boolean find = false;
-        while(queue.size()>=1){
-            if(queue.peek()>=K){
-                find = true;
-                break;
-            }
-            
-            if(queue.size()==1){
-                break;
-            }
-            Long first = queue.poll();
-            Long second = queue.poll();
-            
-            Long newScoville = first+(second*2);
-            queue.add(newScoville);
+        while(pq.peek()<K&&pq.size()>1){
+            int min = pq.poll();
+            int sec = pq.poll();
+            int newFood = min+(sec*2);
+            pq.add(newFood);
             answer++;
+            
         }
-        if(find)
-            return answer;
         
-        return -1;
-        
+        if(pq.peek()<K) return -1;
+        return answer;
     }
 }
